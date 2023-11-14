@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="82px" height="82px" viewBox="0 0 82 82" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 62 (91390) - https://sketch.com -->
+    <title>在线服务数</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <circle id="path-1" cx="41" cy="41" r="41"></circle>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-3">
+            <stop stop-color="#94BFFF" offset="0%"></stop>
+            <stop stop-color="#0052D7" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="123.524678%" id="linearGradient-4">
+            <stop stop-color="#4791FF" offset="0%"></stop>
+            <stop stop-color="#0052D9" offset="100%"></stop>
+        </linearGradient>
+        <path d="M59,36 C60.1045695,36 61,36.8954305 61,38 L61,72.734567 C61,73.8391365 60.1045695,74.734567 59,74.734567 L32.3947221,74.734567 C30.5422475,76.4186786 27.5541006,78.8404896 23.4302811,82 C23.5638896,79.3972055 23.5638896,76.9753945 23.4302811,74.734567 L16,74.734567 C14.8954305,74.734567 14,73.8391365 14,72.734567 L14,38 C14,36.8954305 14.8954305,36 16,36 L59,36 Z M24.5,51 C22.5670034,51 21,52.5670034 21,54.5 C21,56.4329966 22.5670034,58 24.5,58 C26.4329966,58 28,56.4329966 28,54.5 C28,52.5670034 26.4329966,51 24.5,51 Z M37.5,51 C35.5670034,51 34,52.5670034 34,54.5 C34,56.4329966 35.5670034,58 37.5,58 C39.4329966,58 41,56.4329966 41,54.5 C41,52.5670034 39.4329966,51 37.5,51 Z M50.5,51 C48.5670034,51 47,52.5670034 47,54.5 C47,56.4329966 48.5670034,58 50.5,58 C52.4329966,58 54,56.4329966 54,54.5 C54,52.5670034 52.4329966,51 50.5,51 Z" id="path-5"></path>
+        <filter x="-14.9%" y="-10.9%" width="129.8%" height="130.4%" filterUnits="objectBoundingBox" id="filter-6">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.349019608   0 0 0 0 0.607843137   0 0 0 0 1  0 0 0 0.539936626 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="在线服务数" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="编组-12">
+            <g id="在线服务数">
+                <g id="形状结合备份-+-形状结合-蒙版">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <use id="蒙版" fill="#F5F9F9" xlink:href="#path-1"></use>
+                    <path d="M71,60 C72.1045695,60 73,60.8954305 73,62 L73,78.2093393 C73,79.3139088 72.1045695,80.2093393 71,80.2093393 L59.0016725,80.2093393 C58.0951424,81.0880062 56.6328577,82.3515598 54.6148184,84 C54.6802013,82.6420202 54.6802013,81.3784667 54.6148184,80.2093393 L52,80.2093393 C50.8954305,80.2093393 50,79.3139088 50,78.2093393 L50,62 C50,60.8954305 50.8954305,60 52,60 L71,60 Z M54.5,69 C53.6715729,69 53,69.6715729 53,70.5 C53,71.3284271 53.6715729,72 54.5,72 C55.3284271,72 56,71.3284271 56,70.5 C56,69.6715729 55.3284271,69 54.5,69 Z M61.5,69 C60.6715729,69 60,69.6715729 60,70.5 C60,71.3284271 60.6715729,72 61.5,72 C62.3284271,72 63,71.3284271 63,70.5 C63,69.6715729 62.3284271,69 61.5,69 Z M68.5,69 C67.6715729,69 67,69.6715729 67,70.5 C67,71.3284271 67.6715729,72 68.5,72 C69.3284271,72 70,71.3284271 70,70.5 C70,69.6715729 69.3284271,69 68.5,69 Z" id="形状结合备份" fill="url(#linearGradient-3)" mask="url(#mask-2)" transform="translate(61.500000, 72.000000) scale(-1, 1) translate(-61.500000, -72.000000) "></path>
+                    <g id="形状结合" mask="url(#mask-2)">
+                        <use fill="black" fill-opacity="1" filter="url(#filter-6)" xlink:href="#path-5"></use>
+                        <use fill="url(#linearGradient-4)" fill-rule="evenodd" xlink:href="#path-5"></use>
+                    </g>
+                </g>
+            </g>
+            <g id="编组备份-3" opacity="0.660272507" transform="translate(14.000000, 32.000000) rotate(-191.000000) translate(-14.000000, -32.000000) translate(7.000000, 27.000000)">
+                <circle id="椭圆形备份" fill="#5599FF" cx="12.0942569" cy="2.12524791" r="1.5"></circle>
+                <polyline id="路径-11" stroke="#5599FF" points="2.87039164 8.36190298 8.14172392 8.36190298 11.6116491 3.30508768"></polyline>
+                <circle id="椭圆形备份-3" fill="#5599FF" cx="2.07325042" cy="8.43974895" r="1.5"></circle>
+                <circle id="椭圆形备份-25" fill="#5599FF" cx="8.15004771" cy="8.17042641" r="1.5"></circle>
+            </g>
+        </g>
+    </g>
+</svg>
