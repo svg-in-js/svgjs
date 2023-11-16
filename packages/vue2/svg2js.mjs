@@ -2,8 +2,12 @@ import { fse, log, resolveCWD } from '@all-in-js/utils';
 import { globSync } from 'glob';
 import { optimize } from 'svgo';
 
+const matchWidthReg = /width="(\d+)"\s/;
+const matchHeightReg = /height="(\d+)"\s/;
+const xmlns = 'xmlns="http://www.w3.org/2000/svg"';
 const defaultOption = {
   nameSep: '-',
+  spriteId: 'svg_sprite_created_by_svg2js',
   setFileName(defaultFileName, nameSep) {
     return defaultFileName.replace(/\//g, nameSep);
   },
@@ -69,6 +73,21 @@ export default class Svg2js {
         multipass: true,
       });
 
+      // 保留原始的宽高，作为组件内的默认值
+      const [, matchWidth] = buildSvg.data.match(matchWidthReg) || [];
+      const [, matchHeight] = buildSvg.data.match(matchHeightReg) || [];
+      
+      if (matchWidth) {
+        buildSvg.width = matchWidth;
+      }
+
+      if (matchHeight) {
+        buildSvg.height = matchHeight;
+      }
+
+      // 移除默认的宽高，便于使用中自定义宽高
+      buildSvg.data = buildSvg.data.replace(matchWidthReg, '').replace(matchHeightReg, '');
+
       const compressPercent = Math.round((1 - buildSvg.data.length / svgStr.length) * 100);
   
       this.compressPercentMap.set(filename, compressPercent);
@@ -82,23 +101,27 @@ export default class Svg2js {
    */
   createSvgSprite() {
     const { filesMap } = this;
-    const svgSymbols = [];
+    const { spriteId } = this.option;
+    const svgSymbols = [`<svg id="${spriteId}" style="display:none;" ${xmlns}>`];
 
     for (const [filename, svgData] of filesMap) {
-      const svgSymbol = svgData.data.replace('<svg', `<symbol id="${filename}"`).replace('</svg>', '</symbol>');
+      const svgSymbol = svgData.data.replace('<svg', `<symbol id="${filename}"`).replace('</svg>', '</symbol>').replace(xmlns, '');
 
       svgSymbols.push(svgSymbol);
     }
 
-    return `<svg id="" style="display:none;">
-  ${ svgSymbols.join('') }
-</svg>`;
+    svgSymbols.push('</svg>');
+
+    return svgSymbols;
   }
 }
 
-const svg2js = new Svg2js('src/assets');
+(async () => {
+  const svg2js = new Svg2js('src/assets');
 
-const files = svg2js.optimizeSvg();
+  const files = svg2js.optimizeSvg();
 
-console.log(files);
-fse.writeFileSync(resolveCWD('a.svg'), svg2js.createSvgSprite());
+  console.log(files);
+
+  fse.writeFileSync(resolveCWD('a.svg'), svg2js.createSvgSprite().join(''));
+})();
