@@ -1,13 +1,18 @@
-import { fse, log, resolveCWD } from '@all-in-js/utils';
 import { globSync } from 'glob';
 import { optimize } from 'svgo';
+import { fse, log, resolveCWD } from '@all-in-js/utils';
+import { createSvgSpriteRuntimeJs } from './template/svg-sprite-runtime.mjs';
+import { createPreviewPage } from './template/preview-page.mjs';
 
-const matchWidthReg = /width="(\d+)"\s/;
-const matchHeightReg = /height="(\d+)"\s/;
-const xmlns = 'xmlns="http://www.w3.org/2000/svg"';
+const matchWidthReg = /width="(\d+)"\s?/;
+const matchHeightReg = /height="(\d+)"\s?/;
+const matchViewbox = /viewBox="([\s\d]+)"/;
+const svgXMLNs = 'http://www.w3.org/2000/svg';
+const xmlns = `xmlns="${svgXMLNs}"`;
 const defaultOption = {
   nameSep: '-',
   spriteId: 'svg_sprite_created_by_svg2js',
+  outputFolder: 'svg2js-preview',
   setFileName(defaultFileName, nameSep) {
     return defaultFileName.replace(/\//g, nameSep);
   },
@@ -21,12 +26,16 @@ export default class Svg2js {
    * @param {string} entryFolder 查找 svg 文件的入口目录
    * @param {string} option.nameSep 在包含多层目录时，文件名默认会带上目录层级作为前缀，通过 nameSep 设置目录分隔符
    * @param {function} option.setFileName 自定义文件名
+   * @param {string} option.spriteId svgSprite ID
    */
-  constructor(entryFolder, option) {
+  constructor(entryFolder, option = {}) {
     this.entryFolder = entryFolder || '.';
-    this.compressPercentMap = new Map();
-    this.filesMap = new Map();
-    this.option = option || defaultOption;
+    this.compressPercentMap = new Map(); // 保存每个 svg 文件的压缩比
+    this.filesMap = new Map(); // 保存所有 svg 的基本信息
+    this.option = {
+      ...defaultOption,
+      ...option,
+    };
   }
   /**
    * 从指定目录查找出所有的 svg 文件
@@ -60,12 +69,17 @@ export default class Svg2js {
     const { nameSep, setFileName } = this.option;
 
     svgFiles.forEach(svgFilePath => {
-      const svgStr = fse.readFileSync(resolveCWD(svgFilePath)).toString();
+      const svgStr = fse.readFileSync(
+        resolveCWD(svgFilePath),
+        {
+          encoding: 'utf-8',
+        }
+      ).toString();
       let filename = svgFilePath.replace(`${entryFolder}/`, '').replace(/\.svg$/, '');
 
       if (nameSep && !setFileName) {
         filename = filename.replace(/\//g, nameSep);
-      } else if (setFileName) {
+      } else if (typeof setFileName === 'function') {
         filename = setFileName(filename, nameSep);
       }
       
@@ -76,13 +90,23 @@ export default class Svg2js {
       // 保留原始的宽高，作为组件内的默认值
       const [, matchWidth] = buildSvg.data.match(matchWidthReg) || [];
       const [, matchHeight] = buildSvg.data.match(matchHeightReg) || [];
-      
+      let [, viewBox] = buildSvg.data.match(matchViewbox) || [];
+      let viewBoxW, viewBoxH;
+
+      if (viewBox) {
+        [,, viewBoxW, viewBoxH] = viewBox.split(/\s/);
+      }
+
       if (matchWidth) {
         buildSvg.width = matchWidth;
+      } else if (viewBoxW) {
+        buildSvg.width = viewBoxW;
       }
 
       if (matchHeight) {
         buildSvg.height = matchHeight;
+      } else if (viewBoxH) {
+        buildSvg.height = viewBoxH;
       }
 
       // 移除默认的宽高，便于使用中自定义宽高
@@ -99,10 +123,9 @@ export default class Svg2js {
   /**
    * 生成 svgSprite
    */
-  createSvgSprite() {
+  createSvgSymbols() {
     const { filesMap } = this;
-    const { spriteId } = this.option;
-    const svgSymbols = [`<svg id="${spriteId}" style="display:none;" ${xmlns}>`];
+    const svgSymbols = [];
 
     for (const [filename, svgData] of filesMap) {
       const svgSymbol = svgData.data.replace('<svg', `<symbol id="${filename}"`).replace('</svg>', '</symbol>').replace(xmlns, '');
@@ -110,18 +133,49 @@ export default class Svg2js {
       svgSymbols.push(svgSymbol);
     }
 
-    svgSymbols.push('</svg>');
-
     return svgSymbols;
+  }
+  /**
+   * 创建 svgSprite runtime
+   */
+  createBrowserRuntime() {
+    const { spriteId } = this.option;
+    const svgSymbols = this.createSvgSymbols();
+    
+    return createSvgSpriteRuntimeJs(spriteId, svgSymbols, svgXMLNs);
+  }
+  /**
+   * 创建预览 svg 的 html 页面，用于查询和管理图标，便于复制组件代码直接在项目中使用
+   */
+  createPreviewPage() {
+    const svgData = Object.fromEntries(this.filesMap);
+    const compressPercentObj = Object.fromEntries(this.compressPercentMap);
+    const svgSpriteRuntime = this.createBrowserRuntime();
+
+    return createPreviewPage(svgSpriteRuntime, svgData, compressPercentObj);
+  }
+  /**
+   * 最终产出一个 runtime 和一个辅助查询和使用的页面
+   */
+  output() {
+    const { outputFolder } = this.option;
+    const svgSpriteJs = this.createBrowserRuntime();
+    const pageHtml = this.createPreviewPage();
+    const outputFolderPath = resolveCWD(outputFolder);
+
+    fse.ensureDirSync(outputFolderPath);
+    fse.writeFileSync(resolveCWD(outputFolderPath, 'svg-sprite.js'), svgSpriteJs);
+    fse.writeFileSync(resolveCWD(outputFolderPath, 'svg-preview.html'), pageHtml);
   }
 }
 
+// 如何去除项目没使用到的
 (async () => {
-  const svg2js = new Svg2js('src/assets');
+  const svg2js = new Svg2js('src/assets', {
+    outputFolder: 'static/svg2js',
+  });
 
-  const files = svg2js.optimizeSvg();
+  svg2js.optimizeSvg();
+  svg2js.output();
 
-  console.log(files);
-
-  fse.writeFileSync(resolveCWD('a.svg'), svg2js.createSvgSprite().join(''));
 })();
