@@ -19,7 +19,7 @@ const defaultOption = {
 };
 
 /**
- * 将指定目录中所有的 svg 文件转换成一个包含 svg 内容的 json 文件
+ * 通过脚本的方式，将项目中的 svg 文件进行压缩优化并生成一个 svg sprite
  */
 export default class Svg2js {
   /**
