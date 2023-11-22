@@ -2,7 +2,7 @@
   <svg
     class="svg-symbol-icon"
     :class="{
-      'not-allowed': disabled,
+      'svg-not-allowed': disabled,
       'svg-symbol-spin': spin,
     }"
     :style="style"
@@ -28,21 +28,41 @@ export default {
      */
     size: [Number, String, Array],
     /**
-     * 是否旋转
-     */
-    spin: Boolean,
-    /**
      * 设置宽和高度的单位
      */
-    sizeUnit: {
+     sizeUnit: {
       type: String,
       default: () => 'px',
     },
+    /**
+     * 是否使用旋转动画
+     */
+    spin: Boolean,
+    /**
+     * 纵向翻转
+     */
+    flipV: Boolean,
+    /**
+     * 横向翻转
+     */
+    flipH: Boolean,
+    /**
+     * 默认颜色
+     */
+    color: String,
+    /**
+     * 禁用试的颜色
+     */
+    disabledColor: String,
+    /**
+     * hover 时的颜色
+     */
+    hoverColor: String,
+    /**
+     * actived 的颜色
+     */
+    activedColor: String,
   },
-  components: {
-    
-  },
-  mixins: [],
   data() {
     return {
       
@@ -66,17 +86,30 @@ export default {
       style.width = `${parseInt(arr[0], 10)}${sizeUnit}`;
       style.height = `${parseInt(arr[1], 10)}${sizeUnit}`;
 
+      // 设置 flip
+      const flipStyle = [];
+      if (this.flipH) {
+        flipStyle.push('scaleX(-1)');
+      }
+
+      if (this.flipV) {
+        flipStyle.push('scaleY(-1)');
+      }
+
+      if (flipStyle.length) {
+        style.transform = flipStyle.join(' ');
+      }
+
       return style;
     },
   },
   watch: {
     
   },
-  mounted() {
-    
-  },
   methods: {
     handleClick(e) {
+      if (this.disabled) return;
+
       this.$emit('click', e);
     },
   }
@@ -101,7 +134,7 @@ export default {
   &.svg-symbol-spin {
     animation: spining 1s linear infinite;
   }
-  &.not-allowed {
+  &.svg-not-allowed {
     color: #c5c8ce;
     cursor: default;
     &:hover {

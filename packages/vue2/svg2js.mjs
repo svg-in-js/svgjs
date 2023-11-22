@@ -155,16 +155,25 @@ export default class Svg2js {
     return createPreviewPage(svgSpriteRuntime, svgData, compressPercentObj);
   }
   /**
-   * 最终产出一个 runtime 和一个辅助查询和使用的页面
+   * 最终产出一个 svgSprite runtime
    */
-  output() {
+  outputSpriteJS() {
     const { outputFolder } = this.option;
     const svgSpriteJs = this.createBrowserRuntime();
-    const pageHtml = this.createPreviewPage();
     const outputFolderPath = resolveCWD(outputFolder);
 
     fse.ensureDirSync(outputFolderPath);
     fse.writeFileSync(resolveCWD(outputFolderPath, 'svg-sprite.js'), svgSpriteJs);
+  }
+  /**
+   * 最终产出一个辅助查询和使用的页面
+   */
+  outputSpriteJS() {
+    const { outputFolder } = this.option;
+    const pageHtml = this.createPreviewPage();
+    const outputFolderPath = resolveCWD(outputFolder);
+
+    fse.ensureDirSync(outputFolderPath);
     fse.writeFileSync(resolveCWD(outputFolderPath, 'svg-preview.html'), pageHtml);
   }
 }

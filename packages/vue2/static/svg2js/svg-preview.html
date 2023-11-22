@@ -30,7 +30,7 @@
         const compressPercentObj = {"add":28,"svg-zuoyi_icon":70,"svg-zoom-out":12,"svg-workshop-zbwd":53,"svg-workshop-ywxd":34,"svg-workshop-tmap-logo":41,"svg-workshop-tjzq":66,"svg-home-sjguanli_icon":17,"svg-home-shichang_icon":27,"svg-common-yichang_icon":68,"svg-common-service-call-online":49,"svg-chat-warning-orange-icon":45,"svg-chat-warning-icon":47};
         const svgItem = (filename, data, percent) => {
           return `<div class="svg">
-            <svg style="width: ${data.width}px; height: ${data.height}px"><use xlink:href="#${filename}"></use></svg>
+            <svg style="width: ${data.width}px; height: ${data.height}px;fill:currentColor"><use xlink:href="#${filename}"></use></svg>
             <p>${filename}</p>
             <p>压缩率: ${percent}%</p>
           </div>`;
