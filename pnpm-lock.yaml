@@ -8,6 +8,18 @@ importers:
 
   .: {}
 
+  packages/cli:
+    dependencies:
+      '@all-in-js/utils':
+        specifier: ^1.1.0
+        version: 1.1.0
+      glob:
+        specifier: ^10.3.10
+        version: 10.3.10
+      svgo:
+        specifier: ^3.0.3
+        version: 3.0.3
+
   packages/vue2:
     dependencies:
       '@all-in-js/utils':

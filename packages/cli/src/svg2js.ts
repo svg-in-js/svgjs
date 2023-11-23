@@ -1,15 +1,22 @@
 import { globSync } from 'glob';
 import { optimize } from 'svgo';
 import { fse, log, resolveCWD } from '@all-in-js/utils';
-import { createSvgSpriteRuntimeJs } from './template/svg-sprite-runtime.mjs';
-import { createPreviewPage } from './template/preview-page.mjs';
+import { createSvgSpriteRuntimeJs } from './template/svg-sprite-runtime.js';
+import { createPreviewPage } from './template/preview-page.js';
+
+interface IOption {
+  nameSep?: string;
+  spriteId?: string;
+  outputFolder?: string;
+  setFileName?: (filename: string, nameSep: string) => string;
+}
 
 const matchWidthReg = /width="(\d+)"\s?/;
 const matchHeightReg = /height="(\d+)"\s?/;
 const matchViewbox = /viewBox="([\s\d]+)"/;
 const svgXMLNs = 'http://www.w3.org/2000/svg';
 const xmlns = `xmlns="${svgXMLNs}"`;
-const defaultOption = {
+const defaultOption: IOption = {
   nameSep: '-',
   spriteId: 'svg_sprite_created_by_svg2js',
   outputFolder: 'svg2js-preview',
@@ -28,7 +35,7 @@ export default class Svg2js {
    * @param {function} option.setFileName 自定义文件名
    * @param {string} option.spriteId svgSprite ID
    */
-  constructor(entryFolder, option = {}) {
+  constructor(entryFolder: string, option?: IOption = ) {
     this.entryFolder = entryFolder || '.';
     this.compressPercentMap = new Map(); // 保存每个 svg 文件的压缩比
     this.filesMap = new Map(); // 保存所有 svg 的基本信息

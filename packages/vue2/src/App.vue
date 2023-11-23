@@ -1,16 +1,24 @@
 <template>
   <div id="app">
     <router-view/>
+    <div class="css-var">
+  </div>
+    <br>
     svg preview:
-    <svg style="width:77px;height:20px">
+    <svg style="width:77px;height:20px" data-id="s-1">
       <use xlink:href="#svg-workshop-tmap-logo"></use>
     </svg>
   </div>
 </template>
 
 <script>
+import cssVar from './css-var.vue'
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    cssVar
+  }
 }
 </script>
 
@@ -20,7 +28,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: var(--color);
   margin-top: 60px;
 }
 </style>

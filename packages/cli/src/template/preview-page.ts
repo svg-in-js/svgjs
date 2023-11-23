@@ -1,4 +1,4 @@
-export function createPreviewPage(svgSpriteRuntime, svgsData, compressPercentObj) {
+export function createPreviewPage(svgSpriteRuntime: string, svgsData: object, compressPercentObj: object): string {
   const pageHtml = `
     <!DOCTYPE html>
     <html lang="en">
