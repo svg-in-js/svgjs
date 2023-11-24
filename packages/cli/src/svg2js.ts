@@ -1,14 +1,21 @@
 import { globSync } from 'glob';
 import { optimize } from 'svgo';
 import { fse, log, resolveCWD } from '@all-in-js/utils';
-import { createSvgSpriteRuntimeJs } from './template/svg-sprite-runtime.js';
-import { createPreviewPage } from './template/preview-page.js';
+import { createSvgSpriteRuntimeJs } from './template/svg-sprite-runtime';
+import { createPreviewPage } from './template/preview-page';
 
+export type FilesMap = Map<string, ISvgData>;
 interface IOption {
   nameSep?: string;
   spriteId?: string;
   outputFolder?: string;
-  setFileName?: (filename: string, nameSep: string) => string;
+  setFileName?: (filename: string, nameSep: IOption['nameSep']) => string;
+}
+
+interface ISvgData {
+  data: string;
+  width?: string,
+  height?: string;
 }
 
 const matchWidthReg = /width="(\d+)"\s?/;
@@ -21,7 +28,7 @@ const defaultOption: IOption = {
   spriteId: 'svg_sprite_created_by_svg2js',
   outputFolder: 'svg2js-preview',
   setFileName(defaultFileName, nameSep) {
-    return defaultFileName.replace(/\//g, nameSep);
+    return defaultFileName.replace(/\//g, nameSep || '');
   },
 };
 
@@ -29,35 +36,43 @@ const defaultOption: IOption = {
  * 通过脚本的方式，将项目中的 svg 文件进行压缩优化并生成一个 svg sprite
  */
 export default class Svg2js {
+  entryFolder: string
+  filesMap: FilesMap
+  compressPercentMap: Map<string, number>
+  option: IOption
   /**
    * @param {string} entryFolder 查找 svg 文件的入口目录
    * @param {string} option.nameSep 在包含多层目录时，文件名默认会带上目录层级作为前缀，通过 nameSep 设置目录分隔符
    * @param {function} option.setFileName 自定义文件名
    * @param {string} option.spriteId svgSprite ID
    */
-  constructor(entryFolder: string, option?: IOption = ) {
+  constructor(entryFolder: string, option?: IOption) {
     this.entryFolder = entryFolder || '.';
     this.compressPercentMap = new Map(); // 保存每个 svg 文件的压缩比
     this.filesMap = new Map(); // 保存所有 svg 的基本信息
     this.option = {
       ...defaultOption,
-      ...option,
+      ...(option || {}),
     };
   }
   /**
    * 从指定目录查找出所有的 svg 文件
    */
-  findSvg() {
+  findSvg(): string[] {
     const { entryFolder } = this;
   
     let target = resolveCWD(entryFolder);
   
     if (!fse.existsSync(target)) {
-      return log.error('please set an exists entry folder.');
+      log.error('please set an exists entry folder.');
+
+      return [];
     }
   
     if (entryFolder.startsWith('.') || entryFolder.startsWith('/')) {
-      return log.error('please set entry folder start with a folder name.');
+      log.error('please set entry folder start with a folder name.');
+
+      return []
     }
   
     const files = globSync(`${entryFolder}/**/*.svg`);
@@ -67,10 +82,10 @@ export default class Svg2js {
   /**
    * 将查找到的所有 svg 使用 svgo 进行压缩，并生成 json 文件
    */
-  optimizeSvg() {
+  optimizeSvg(): FilesMap {
     const svgFiles = this.findSvg();
 
-    if (!svgFiles?.length) return [];
+    if (!svgFiles?.length) return this.filesMap;
 
     const { entryFolder } = this;
     const { nameSep, setFileName } = this.option;
@@ -84,13 +99,13 @@ export default class Svg2js {
       ).toString();
       let filename = svgFilePath.replace(`${entryFolder}/`, '').replace(/\.svg$/, '');
 
-      if (nameSep && !setFileName) {
+      if (nameSep !== undefined && !setFileName) {
         filename = filename.replace(/\//g, nameSep);
       } else if (typeof setFileName === 'function') {
         filename = setFileName(filename, nameSep);
       }
       
-      const buildSvg = optimize(svgStr, {
+      const buildSvg: ISvgData = optimize(svgStr, {
         multipass: true,
       });
 
@@ -167,31 +182,37 @@ export default class Svg2js {
   outputSpriteJS() {
     const { outputFolder } = this.option;
     const svgSpriteJs = this.createBrowserRuntime();
-    const outputFolderPath = resolveCWD(outputFolder);
+    const outputFolderPath = resolveCWD(outputFolder || '');
+    const outputFile = resolveCWD(outputFolderPath, 'svg-sprite.js');
 
     fse.ensureDirSync(outputFolderPath);
-    fse.writeFileSync(resolveCWD(outputFolderPath, 'svg-sprite.js'), svgSpriteJs);
+    fse.writeFileSync(outputFile, svgSpriteJs);
+
+    return outputFile;
   }
   /**
    * 最终产出一个辅助查询和使用的页面
    */
-  outputSpriteJS() {
+  outputPreviewHtml() {
     const { outputFolder } = this.option;
     const pageHtml = this.createPreviewPage();
-    const outputFolderPath = resolveCWD(outputFolder);
+    const outputFolderPath = resolveCWD(outputFolder || '');
+    const outputFile = resolveCWD(outputFolderPath, 'svg-preview.html');
 
     fse.ensureDirSync(outputFolderPath);
-    fse.writeFileSync(resolveCWD(outputFolderPath, 'svg-preview.html'), pageHtml);
+    fse.writeFileSync(outputFile, pageHtml);
+
+    return outputFile;
   }
 }
 
-// 如何去除项目没使用到的
-(async () => {
-  const svg2js = new Svg2js('src/assets', {
-    outputFolder: 'static/svg2js',
-  });
+// // 如何去除项目没使用到的
+// (async () => {
+//   const svg2js = new Svg2js('src/assets', {
+//     outputFolder: 'static/svg2js',
+//   });
 
-  svg2js.optimizeSvg();
-  svg2js.output();
+//   svg2js.optimizeSvg();
+//   // svg2js.output();
 
-})();
+// })();

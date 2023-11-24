@@ -1,4 +1,4 @@
-export function createSvgSpriteRuntimeJs(spriteId: string, svgSymbols: string[], svgXMLNs: string): string {
+export function createSvgSpriteRuntimeJs(spriteId: any, svgSymbols: string[], svgXMLNs: string): string {
   const runtimeJs =  `
     document.addEventListener('DOMContentLoaded', function() {
       const svgWrapperEl = document.createElement('div');
