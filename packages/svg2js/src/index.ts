@@ -1,6 +1,6 @@
 import { globSync } from 'glob';
 import { optimize } from 'svgo';
-import { fse, log, resolveCWD } from '@all-in-js/utils';
+import { fse, resolveCWD } from '@all-in-js/utils';
 import { createSvgSpriteRuntimeJs } from './template/svg-sprite-runtime';
 import { createPreviewPage } from './template/preview-page';
 
@@ -48,7 +48,7 @@ export default class Svg2js {
    */
   constructor(entryFolder: string, option?: IOption) {
     this.entryFolder = entryFolder || '.';
-    this.compressPercentMap = new Map(); // 保存每个 svg 文件的压缩比
+    this.compressPercentMap = new Map(); // 保存每个 svg 文件的压缩比率
     this.filesMap = new Map(); // 保存所有 svg 的基本信息
     this.option = {
       ...defaultOption,
@@ -64,15 +64,11 @@ export default class Svg2js {
     let target = resolveCWD(entryFolder);
   
     if (!fse.existsSync(target)) {
-      log.error('please set an exists entry folder.');
-
-      return [];
+      throw new Error('please set an exists entry folder.');
     }
   
     if (entryFolder.startsWith('.') || entryFolder.startsWith('/')) {
-      log.error('please set entry folder start with a folder name.');
-
-      return []
+      throw new Error('please set entry folder start with a folder name.');
     }
   
     const files = globSync(`${entryFolder}/**/*.svg`);
@@ -80,7 +76,8 @@ export default class Svg2js {
     return files || [];
   }
   /**
-   * 将查找到的所有 svg 使用 svgo 进行压缩，并生成 json 文件
+   * 将查找到的所有 svg 使用 svgo 进行压缩
+   * 通过脚本提取 svg 的宽、高、viewBox、颜色值等信息，而不用在运行时做处理，提高运行时的效率
    */
   optimizeSvg(): FilesMap {
     const svgFiles = this.findSvg();
@@ -131,7 +128,7 @@ export default class Svg2js {
         buildSvg.height = viewBoxH;
       }
 
-      // 移除默认的宽高，便于使用中自定义宽高
+      // 移除默认的宽高，便于在使用 svg 时自定义宽高
       buildSvg.data = buildSvg.data.replace(matchWidthReg, '').replace(matchHeightReg, '');
 
       const compressPercent = Math.round((1 - buildSvg.data.length / svgStr.length) * 100);

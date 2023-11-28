@@ -1,9 +1,8 @@
 import parser from 'yargs-parser'
-import Svg2js, { FilesMap } from './svg2js';
+import Svg2js, { FilesMap } from './index';
 import { Spinner, log, c } from '@all-in-js/utils';
 import pkg from '../package.json'
 
-const spin = new Spinner('');
 const CLI_NAME = 'svg2js';
 const {
   _: [command],
@@ -67,6 +66,8 @@ function showVersion() {
  * {CLI_NAME}
  */
 function build() {
+  const spin = new Spinner('');
+  
   spin.step('start find and optimize your svg files.');
 
   const svg2js = new Svg2js(
@@ -77,7 +78,16 @@ function build() {
     }
   );
 
-  const svgs: FilesMap = svg2js.optimizeSvg();
+  let svgs: FilesMap = new Map();
+
+  try {
+    svgs = svg2js.optimizeSvg();
+  } catch (e: any) {
+    spin.stop();
+    log.error(e.message);
+    return;
+  }
+
   const outputFile = svg2js.outputSpriteJS();
 
   spin.stop();
