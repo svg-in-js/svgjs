@@ -194,7 +194,7 @@ export default class Svg2js {
     const { outputFolder } = this.option;
     const pageHtml = this.createPreviewPage();
     const outputFolderPath = resolveCWD(outputFolder || '');
-    const outputFile = resolveCWD(outputFolderPath, 'svg-preview.html');
+    const outputFile = resolveCWD(outputFolderPath, 'index.html');
 
     fse.ensureDirSync(outputFolderPath);
     fse.writeFileSync(outputFile, pageHtml);

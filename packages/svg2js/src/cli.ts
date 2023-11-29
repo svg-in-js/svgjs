@@ -17,6 +17,9 @@ const {
       spriteId: ['id'],
       output: ['o'],
     },
+    configuration: {
+      'short-option-groups': false,
+    },
 })
 
 /**
@@ -65,9 +68,9 @@ function showVersion() {
  * or 
  * {CLI_NAME}
  */
-function build() {
+function build(preview?: boolean) {
   const spin = new Spinner('');
-  
+
   spin.step('start find and optimize your svg files.');
 
   const svg2js = new Svg2js(
@@ -88,14 +91,12 @@ function build() {
     return;
   }
 
-  const outputFile = svg2js.outputSpriteJS();
+  const outputFile = svg2js[preview ? 'outputPreviewHtml' : 'outputSpriteJS']();
 
   spin.stop();
 
   log.info(`There are ${c.cyan(svgs.size)} svg files has found and optimized.`, CLI_NAME);
   log.info(`Output: ${outputFile}`, CLI_NAME);
-  log.info(`Please import this svg-sprite file in your project, then you can use it by filename.`, CLI_NAME);
-  log.info(`If you dont remembered the filename, you can run '${CLI_NAME} preview [option]', find a svg and copy it.`);
 }
 
 /**
@@ -111,8 +112,10 @@ function run() {
   } else {
     if ([undefined, 'b', 'build'].includes(command as string | undefined)) {
       build();
+      log.info(`Please import this svg-sprite file in your project, then you can use it by filename.`, CLI_NAME);
+      log.info(`If you dont remembered the filename, you can run '${CLI_NAME} preview [option]', find a svg and copy it.`);
     } else if (command === 'preview') {
-      preview();
+      build(true);
     } else {
       console.log('the command only support build or preview.');
     }

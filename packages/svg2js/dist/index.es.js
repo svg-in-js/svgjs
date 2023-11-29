@@ -26,11 +26,46 @@ function createPreviewPage(svgSpriteRuntime, svgsData, compressPercentObj) {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Preview Svgs</title>
+      <style>
+      html,body,#app {
+        height: 100%;
+      }
+      body {
+        overflow: hidden;
+        font-size: 12px;
+        color: #4b4848;
+      }
+      #app {
+        display: flex;
+        flex-direction: column;
+      }
+      input {
+        width: 170px;
+        margin-bottom: 10px;
+      }
+      .main-content {
+        flex: 1;
+        overflow: auto;
+      }
+      .svg {
+        display: inline-block;
+        font-size: 12px;
+        text-align: left;
+        margin-right: 15px;
+        margin-bottom: 15px;
+        cursor: pointer;
+      }
+      </style>
     </head>
     <body>
       <div id="app">
-        <input placeholder="查询 svg" />
-        <div class="svgs"></div>
+        <div class="top-bar">
+          <input placeholder="查询 svg" />
+          <span>共 <b class="total"></b> 个</span>
+        </div>
+        <div class="main-content">
+          <div class="svgs"></div>
+        </div>
       </div>
       <script>
         ${svgSpriteRuntime}
@@ -57,11 +92,20 @@ function createPreviewPage(svgSpriteRuntime, svgsData, compressPercentObj) {
               results.push(svgItem(filename, svgs[filename], compressPercentObj[filename]));
             }
           }
-    
-          return results;
+
+          document.querySelector('.svgs').innerHTML = results.join('');
+          document.querySelector('.total').innerHTML = results.length;
         }
     
-        document.querySelector('.svgs').innerHTML = searchSvg().join('');
+        searchSvg();
+
+        const input = document.querySelector('input');
+
+        input.addEventListener('keyup', (e) => {
+          if (e.keyCode === 13) {
+            searchSvg(e.target.value);
+          }
+        });
       </script>
     </body>
     </html>
@@ -220,7 +264,7 @@ class Svg2js {
         const { outputFolder } = this.option;
         const pageHtml = this.createPreviewPage();
         const outputFolderPath = resolveCWD(outputFolder || '');
-        const outputFile = resolveCWD(outputFolderPath, 'svg-preview.html');
+        const outputFile = resolveCWD(outputFolderPath, 'index.html');
         fse.ensureDirSync(outputFolderPath);
         fse.writeFileSync(outputFile, pageHtml);
         return outputFile;

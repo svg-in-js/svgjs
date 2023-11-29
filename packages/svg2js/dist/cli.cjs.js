@@ -22,6 +22,9 @@ const { _: [command], ...argvs } = parser__default(process.argv.slice(2), {
         spriteId: ['id'],
         output: ['o'],
     },
+    configuration: {
+        'short-option-groups': false,
+    },
 });
 /**
  * {CLI_NAME} --entry src/asset/svg --output src/js/svg-sprite
@@ -65,7 +68,7 @@ function showVersion() {
  * or
  * {CLI_NAME}
  */
-function build() {
+function build(preview) {
     const spin = new utils.Spinner('');
     spin.step('start find and optimize your svg files.');
     const svg2js = new Svg2js__default(argvs.entry, {
@@ -81,12 +84,10 @@ function build() {
         utils.log.error(e.message);
         return;
     }
-    const outputFile = svg2js.outputSpriteJS();
+    const outputFile = svg2js[preview ? 'outputPreviewHtml' : 'outputSpriteJS']();
     spin.stop();
     utils.log.info(`There are ${utils.c.cyan(svgs.size)} svg files has found and optimized.`, CLI_NAME);
     utils.log.info(`Output: ${outputFile}`, CLI_NAME);
-    utils.log.info(`Please import this svg-sprite file in your project, then you can use it by filename.`, CLI_NAME);
-    utils.log.info(`If you dont remembered the filename, you can run '${CLI_NAME} preview [option]', find a svg and copy it.`);
 }
 function run() {
     if (argvs.help) {
@@ -98,8 +99,12 @@ function run() {
     else {
         if ([undefined, 'b', 'build'].includes(command)) {
             build();
+            utils.log.info(`Please import this svg-sprite file in your project, then you can use it by filename.`, CLI_NAME);
+            utils.log.info(`If you dont remembered the filename, you can run '${CLI_NAME} preview [option]', find a svg and copy it.`);
         }
-        else if (command === 'preview') ;
+        else if (command === 'preview') {
+            build(true);
+        }
         else {
             console.log('the command only support build or preview.');
         }
