@@ -5,19 +5,20 @@
   </div>
     <br>
     svg preview:
-    <svg style="width:77px;height:20px" data-id="s-1">
+    <!-- <svg style="width:77px;height:20px" data-id="s-1">
       <use xlink:href="#svg-workshop-tmap-logo"></use>
-    </svg>
+    </svg> -->
+    <svg-symbol-icon name="add" size="18" disabled spin />
   </div>
 </template>
 
 <script>
-import cssVar from './css-var.vue'
+import svgSymbolIcon from './svg-symbol-icon.vue'
 
 export default {
   name: 'App',
   components: {
-    cssVar
+    svgSymbolIcon
   }
 }
 </script>

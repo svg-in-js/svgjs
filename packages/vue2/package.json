@@ -8,12 +8,16 @@
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
     "lint": "eslint --ext .js,.vue src",
-    "build": "node build/build.js"
+    "build": "node build/build.js",
+    "preview:svg": "node ../svg2js/dist/cli.cjs.js preview -e 'src/assets' -o static -sep /",
+    "build:svg": "node ../svg2js/dist/cli.cjs.js build -e 'src/assets' -o static -sep /"
   },
   "dependencies": {
     "@all-in-js/utils": "^1.1.0",
+    "babel-runtime": "^6.26.0",
     "glob": "^10.3.10",
     "svgo": "^3.0.3",
+    "typeof": "link:babel-runtime/helpers/typeof",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },

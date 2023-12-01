@@ -23,6 +23,7 @@ declare class Svg2js {
     option: IOption;
     /**
      * @param {string} entryFolder 查找 svg 文件的入口目录
+     * @param {string} option.outputFolder 输出目录
      * @param {string} option.nameSep 在包含多层目录时，文件名默认会带上目录层级作为前缀，通过 nameSep 设置目录分隔符
      * @param {function} option.setFileName 自定义文件名
      * @param {string} option.spriteId svgSprite ID

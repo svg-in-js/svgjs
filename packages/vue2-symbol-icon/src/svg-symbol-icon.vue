@@ -7,7 +7,7 @@
     }"
     :style="style"
     @click="handleClick">
-    <use :link:href="`#${name}`" />
+    <use :xlink:href="`#${name}`" />
     <slot />
   </svg>
 </template>
@@ -30,9 +30,9 @@ export default {
     /**
      * 设置宽和高度的单位
      */
-     sizeUnit: {
+    sizeUnit: {
       type: String,
-      default: () => 'px',
+      default: () => 'px'
     },
     /**
      * 是否使用旋转动画
@@ -61,61 +61,56 @@ export default {
     /**
      * actived 的颜色
      */
-    activedColor: String,
+    activedColor: String
   },
-  data() {
-    return {
-      
-    }
+  data () {
+    return {}
   },
   computed: {
-    style() {
-      let arr = [];
-      const { size, sizeUnit } = this;
-      const style = {};
-      const sizeType = typeof size;
+    style () {
+      let arr = []
+      const { size, sizeUnit } = this
+      const style = {}
+      const sizeType = typeof size
 
       if (['number', 'string'].includes(sizeType)) {
-        arr = [size, size];
+        arr = [size, size]
       }
 
       if (Array.isArray(sizeType)) {
-        arr = size;
+        arr = size
       }
 
-      style.width = `${parseInt(arr[0], 10)}${sizeUnit}`;
-      style.height = `${parseInt(arr[1], 10)}${sizeUnit}`;
+      style.width = `${parseInt(arr[0], 10)}${sizeUnit}`
+      style.height = `${parseInt(arr[1], 10)}${sizeUnit}`
 
       // 设置 flip
-      const flipStyle = [];
+      const flipStyle = []
       if (this.flipH) {
-        flipStyle.push('scaleX(-1)');
+        flipStyle.push('scaleX(-1)')
       }
 
       if (this.flipV) {
-        flipStyle.push('scaleY(-1)');
+        flipStyle.push('scaleY(-1)')
       }
 
       if (flipStyle.length) {
-        style.transform = flipStyle.join(' ');
+        style.transform = flipStyle.join(' ')
       }
 
-      return style;
-    },
-  },
-  watch: {
-    
+      return style
+    }
   },
   methods: {
-    handleClick(e) {
-      if (this.disabled) return;
+    handleClick (e) {
+      if (this.disabled) return
 
-      this.$emit('click', e);
-    },
+      this.$emit('click', e)
+    }
   }
-};
+}
 </script>
-<style lang='less' scoped>
+<style scoped>
 @keyframes spining {
   0% {
     transform: rotate(0deg);
@@ -131,15 +126,17 @@ export default {
 .svg-symbol-icon {
   display: inline-block;
   fill: currentColor;
-  &.svg-symbol-spin {
-    animation: spining 1s linear infinite;
-  }
-  &.svg-not-allowed {
+}
+
+.svg-symbol-spin {
+  animation: spining 1s linear infinite;
+}
+
+.svg-not-allowed {
+  color: #c5c8ce;
+  cursor: default;
+  &:hover {
     color: #c5c8ce;
-    cursor: default;
-    &:hover {
-      color: #c5c8ce;
-    }
   }
 }
 </style>

@@ -1,9 +1,9 @@
 import parser from 'yargs-parser'
-import Svg2js, { FilesMap } from './index';
-import { Spinner, log, c } from '@all-in-js/utils';
+import Svg2js, { FilesMap } from './index'
+import { Spinner, log, c } from '@all-in-js/utils'
 import pkg from '../package.json'
 
-const CLI_NAME = 'svg2js';
+const CLI_NAME = 'svg2js'
 const {
   _: [command],
   ...argvs
@@ -15,7 +15,7 @@ const {
       entry: ['e'],
       nameSep: ['sep'],
       spriteId: ['id'],
-      output: ['o'],
+      outputFolder: ['o'],
     },
     configuration: {
       'short-option-groups': false,
@@ -69,15 +69,13 @@ function showVersion() {
  * {CLI_NAME}
  */
 function build(preview?: boolean) {
-  const spin = new Spinner('');
-
-  spin.step('start find and optimize your svg files.');
-
+  const spin = new Spinner('start find and optimize your svg files.');
   const svg2js = new Svg2js(
     argvs.entry,
     {
       nameSep: argvs.nameSep,
-      spriteId: argvs.spriteId
+      spriteId: argvs.spriteId,
+      outputFolder: argvs.outputFolder
     }
   );
 
@@ -98,11 +96,6 @@ function build(preview?: boolean) {
   log.info(`There are ${c.cyan(svgs.size)} svg files has found and optimized.`, CLI_NAME);
   log.info(`Output: ${outputFile}`, CLI_NAME);
 }
-
-/**
- * svg2js preview
- */
-function preview() {}
 
 function run() {
   if (argvs.help) {

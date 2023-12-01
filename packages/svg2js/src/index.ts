@@ -18,6 +18,7 @@ interface ISvgData {
   height?: string;
 }
 
+const matchSvgTag = /<svg[^>]+>/;
 const matchWidthReg = /width="(\d+)"\s?/;
 const matchHeightReg = /height="(\d+)"\s?/;
 const matchViewbox = /viewBox="([\s\d]+)"/;
@@ -42,6 +43,7 @@ export default class Svg2js {
   option: IOption
   /**
    * @param {string} entryFolder 查找 svg 文件的入口目录
+   * @param {string} option.outputFolder 输出目录
    * @param {string} option.nameSep 在包含多层目录时，文件名默认会带上目录层级作为前缀，通过 nameSep 设置目录分隔符
    * @param {function} option.setFileName 自定义文件名
    * @param {string} option.spriteId svgSprite ID
@@ -103,13 +105,58 @@ export default class Svg2js {
       }
       
       const buildSvg: ISvgData = optimize(svgStr, {
+        path: svgFilePath,
         multipass: true,
+        plugins: [
+          'removeDoctype',
+          'removeXMLProcInst',
+          'removeComments',
+          'removeMetadata',
+          'removeEditorsNSData',
+          'cleanupAttrs',
+          'mergeStyles',
+          'inlineStyles',
+          'minifyStyles',
+          'cleanupIds', // 有在使用中的 ID 则进行 minify
+          'removeUselessDefs',
+          'cleanupNumericValues',
+          'convertColors',
+          'removeUnknownsAndDefaults',
+          'removeNonInheritableGroupAttrs',
+          'removeUselessStrokeAndFill',
+          // 'removeViewBox',
+          'cleanupEnableBackground',
+          'removeHiddenElems',
+          'removeEmptyText',
+          'convertShapeToPath',
+          'convertEllipseToCircle',
+          'moveElemsAttrsToGroup',
+          'moveGroupAttrsToElems',
+          'collapseGroups',
+          'convertPathData',
+          'convertTransform',
+          'removeEmptyAttrs',
+          'removeEmptyContainers',
+          'removeUnusedNS',
+          'mergePaths',
+          'sortAttrs',
+          'sortDefsChildren',
+          'removeTitle',
+          'removeDesc',
+          'prefixIds', // 配合 cleanupIds，在 minify ID 后再加上文件名作为前缀，防止不同文件 ID 重复
+        ],
       });
 
+      const [svgTag] = buildSvg.data.match(matchSvgTag) || [];
+
+      if (!svgTag) {
+        throw new Error('invalid svg content.');
+      }
+
       // 保留原始的宽高，作为组件内的默认值
-      const [, matchWidth] = buildSvg.data.match(matchWidthReg) || [];
-      const [, matchHeight] = buildSvg.data.match(matchHeightReg) || [];
-      let [, viewBox] = buildSvg.data.match(matchViewbox) || [];
+      const [, matchWidth] = svgTag.match(matchWidthReg) || [];
+      const [, matchHeight] = svgTag.match(matchHeightReg) || [];
+      let [, viewBox] = svgTag.match(matchViewbox) || [];
       let viewBoxW, viewBoxH;
 
       if (viewBox) {
@@ -129,7 +176,7 @@ export default class Svg2js {
       }
 
       // 移除默认的宽高，便于在使用 svg 时自定义宽高
-      buildSvg.data = buildSvg.data.replace(matchWidthReg, '').replace(matchHeightReg, '');
+      buildSvg.data = buildSvg.data.replace(matchSvgTag, svgTagStr => svgTagStr.replace(matchWidthReg, '').replace(matchHeightReg, ''));
 
       const compressPercent = Math.round((1 - buildSvg.data.length / svgStr.length) * 100);
   

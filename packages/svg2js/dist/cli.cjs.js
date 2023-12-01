@@ -20,7 +20,7 @@ const { _: [command], ...argvs } = parser__default(process.argv.slice(2), {
         entry: ['e'],
         nameSep: ['sep'],
         spriteId: ['id'],
-        output: ['o'],
+        outputFolder: ['o'],
     },
     configuration: {
         'short-option-groups': false,
@@ -69,11 +69,11 @@ function showVersion() {
  * {CLI_NAME}
  */
 function build(preview) {
-    const spin = new utils.Spinner('');
-    spin.step('start find and optimize your svg files.');
+    const spin = new utils.Spinner('start find and optimize your svg files.');
     const svg2js = new Svg2js__default(argvs.entry, {
         nameSep: argvs.nameSep,
-        spriteId: argvs.spriteId
+        spriteId: argvs.spriteId,
+        outputFolder: argvs.outputFolder
     });
     let svgs = new Map();
     try {

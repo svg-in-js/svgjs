@@ -4,7 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 
-import '../static/svg2js/svg-sprite.js'
+import '../static/svg-sprite.js'
 
 Vue.config.productionTip = false
 
