@@ -16,11 +16,6 @@
 export default {
   name: 'SvgSymbolIcon',
   props: {
-    /**
-     * svg sprite 内的 symbol 的 ID
-     * 来源 1：在项目内导入通过 svg2js 生成的 svg-sprite，如果存在多级目录，默认会带上目录名，可以使用 svg2js preview [option] 来预览图标，在页面上拷贝图标的名称
-     * 来源 2：兼容项目中现存的 svg-sprite，传入 symbol ID 即可
-     */
     name: String,
     /**
      * 是否禁用

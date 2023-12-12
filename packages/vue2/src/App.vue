@@ -8,18 +8,32 @@
     <!-- <svg style="width:77px;height:20px" data-id="s-1">
       <use xlink:href="#svg-workshop-tmap-logo"></use>
     </svg> -->
-    <svg-symbol-icon name="add" size="18" disabled spin />
+    <svg-symbol-icon :name="name" size="18" disabled spin />
   </div>
 </template>
 
 <script>
-import svgSymbolIcon from './svg-symbol-icon.vue'
-
+import Vue from 'vue';
+import svgSymbolIcon from '@svgjs/vue2-symbol-icon';
+// console.log(SvgSymbolIcon)
+Vue.use(svgSymbolIcon);
 export default {
   name: 'App',
   components: {
-    svgSymbolIcon
-  }
+    // SvgSymbolIcon
+  },
+  data() {
+    return {
+      name: '',
+    }
+  },
+  mounted() {
+    this.name = 'add';
+
+    setTimeout(() => {
+      this.name = 'svg/zuoyi_icon';
+    }, 3000);
+  },
 }
 </script>
 
