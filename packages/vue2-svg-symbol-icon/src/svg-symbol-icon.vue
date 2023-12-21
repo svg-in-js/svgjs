@@ -24,7 +24,8 @@ function setRootCssProp(key, value) {
   value && document.documentElement.style.setProperty(key, value);
 }
 
-export function setGlobalOption(option) {
+// 设置全局颜色
+export function setGlobalOption(option = {}) {
   if (option.color) {
     setRootCssProp(defaultColorKey, option.color);
   }
@@ -70,7 +71,7 @@ export default {
      */
     sizeUnit: {
       type: String,
-      default: () => 'px'
+      default: () => 'px',
     },
     /**
      * 是否使用旋转动画
@@ -89,7 +90,7 @@ export default {
      */
     color: String,
     /**
-     * 禁用试的颜色
+     * 禁用时的颜色
      */
     disabledColor: String,
     /**
@@ -105,8 +106,8 @@ export default {
      */
     displayPlaceholder: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   destroyed() {
     this.destroyTooltip();
@@ -131,39 +132,39 @@ export default {
   },
   data () {
     return {
-      tooltipInstance: null
+      tooltipInstance: null,
     }
   },
   computed: {
     style () {
       let arr = []
-      const { color, hoverColor, activedColor, disabledColor, disabled, size, sizeUnit } = this
-      const style = {}
-      const sizeType = typeof size
+      const { color, hoverColor, activedColor, disabledColor, disabled, size, sizeUnit } = this;
+      const style = {};
+      const sizeType = typeof size;
 
       if (['number', 'string'].includes(sizeType)) {
-        arr = [size, size]
+        arr = [size, size];
       }
 
       if (Array.isArray(sizeType)) {
-        arr = size
+        arr = size;
       }
 
-      style.width = `${parseInt(arr[0], 10)}${sizeUnit}`
-      style.height = `${parseInt(arr[1], 10)}${sizeUnit}`
+      style.width = `${parseInt(arr[0], 10)}${sizeUnit}`;
+      style.height = `${parseInt(arr[1], 10)}${sizeUnit}`;
 
       // 设置 flip
-      const flipStyle = []
+      const flipStyle = [];
       if (this.flipH) {
-        flipStyle.push('scaleX(-1)')
+        flipStyle.push('scaleX(-1)');
       }
 
       if (this.flipV) {
-        flipStyle.push('scaleY(-1)')
+        flipStyle.push('scaleY(-1)');
       }
 
       if (flipStyle.length) {
-        style.transform = flipStyle.join(' ')
+        style.transform = flipStyle.join(' ');
       }
 
       if (color) {
@@ -182,7 +183,7 @@ export default {
         style[disabledColorKey] = disabledColor;
       }
 
-      return style
+      return style;
     }
   },
   mounted() {
@@ -199,7 +200,7 @@ export default {
 
       if (agrType === 'string') {
         tipOption = {
-          content: tooltip
+          content: tooltip,
         };
       }
 
@@ -216,9 +217,9 @@ export default {
       }
     },
     handleClick (e) {
-      if (this.disabled) return
+      if (this.disabled) return;
 
-      this.$emit('click', e)
+      this.$emit('click', e);
     }
   }
 }

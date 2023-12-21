@@ -1,9 +1,9 @@
-import parser from 'yargs-parser'
-import Svg2js, { FilesMap } from './index'
-import { Spinner, log, c } from '@all-in-js/utils'
-import pkg from '../package.json'
+import parser from 'yargs-parser';
+import { Spinner, log, c } from '@all-in-js/utils';
+import Svg2js, { FilesMap } from './index';
+import pkg from '../package.json';
 
-const CLI_NAME = 'svg2js'
+const CLI_NAME = 'svg2js';
 const {
   _: [command],
   ...argvs
@@ -20,7 +20,7 @@ const {
     configuration: {
       'short-option-groups': false,
     },
-})
+});
 
 /**
  * {CLI_NAME} --entry src/asset/svg --output src/js/svg-sprite
@@ -53,14 +53,14 @@ Usage: ${CLI_NAME} [command] [options]
  * {CLI_NAME} --help | --h
  */
 function showHelp() {
-  console.log(helpText)
+  console.log(helpText);
 }
 
 /**
  * {CLI_NAME} --version | --v
  */
 function showVersion() {
-  console.log(pkg.version)
+  console.log(pkg.version);
 }
 
 /**

@@ -1,9 +1,15 @@
+import { fse, resolveCWD } from '@all-in-js/utils';
 import { globSync } from 'glob';
 import { optimize } from 'svgo';
-import { fse, resolveCWD } from '@all-in-js/utils';
 import { createSvgSpriteRuntimeJs } from './template/svg-sprite-runtime';
 import { createPreviewPage } from './template/preview-page';
 import { svgoPlugins } from './svgo-plugins';
+
+export interface ISvgData {
+  data: string;
+  width?: string;
+  height?: string;
+}
 
 export type FilesMap = Map<string, ISvgData>;
 export interface IOption {
@@ -11,12 +17,6 @@ export interface IOption {
   spriteId?: string;
   outputFolder?: string;
   setFileName?: (filename: string, nameSep: IOption['nameSep']) => string;
-}
-
-export interface ISvgData {
-  data: string;
-  width?: string,
-  height?: string;
 }
 
 interface IObject {
@@ -29,6 +29,9 @@ const matchHeightReg = /height="(\d+)"\s?/;
 const matchViewbox = /viewBox="([\s\d]+)"/;
 const svgXMLNs = 'http://www.w3.org/2000/svg';
 const xmlns = `xmlns="${svgXMLNs}"`;
+const singleColorReg = /<(?:path|rect|circle|polygon|line|polyline|ellipse).+?(?:fill|stroke)="([^"]+)"/gi;
+const ignorePathWithUrl = /<(path|rect|circle|polygon|line|polyline|ellipse).+?(fill|stroke)="url\([^"]+\)"/gi;
+const matchColor = /([^"]+)"$/;
 const defaultOption: IOption = {
   nameSep: '-',
   spriteId: 'svg_sprite_created_by_svg2js',
@@ -37,9 +40,11 @@ const defaultOption: IOption = {
     return defaultFileName.replace(/\//g, nameSep || '');
   },
 };
-const singleColorReg = /<(?:path|rect|circle|polygon|line|polyline|ellipse).+?(?:fill|stroke)="([^"]+)"/gi;
-const ignorePathWithUrl = /<(path|rect|circle|polygon|line|polyline|ellipse).+?(fill|stroke)="url\([^"]+\)"/gi;
-const matchColor = /([^"]+)"$/;
+
+/**
+ * Object.assign 做合并时，如果传入的值为 undefined 也会替换原有的值
+ * 此处兼容不传值或者值为 undefined 时，不做 merge 操作，使用原值
+ */
 const mergeOption = (defaultOption: IObject, option: IObject) => {
   const obj: IObject = {};
 
@@ -55,8 +60,14 @@ const mergeOption = (defaultOption: IObject, option: IObject) => {
     ...obj,
   }
 }
+
 /**
- * 通过脚本的方式，将项目中的 svg 文件进行压缩优化并生成一个 svg sprite
+ * 工具提供以下几个功能：
+ * 1. 优化图标
+ * 2. 提取图标的关键信息
+ * 3. 颜色方案设置
+ * 4. 创建 svg-sprite
+ * 5. 预览图标
  */
 export default class Svg2js {
   entryFolder: string
@@ -124,8 +135,10 @@ export default class Svg2js {
     return [...new Set(colors)];
   }
   /**
-   * 将查找到的所有 svg 使用 svgo 进行压缩
-   * 通过脚本提取 svg 的宽、高、viewBox、颜色值等信息，而不用在运行时做处理，提高运行时的效率
+   * 将查找到的所有 svg 使用 svgo 进行优化
+   * 通过脚本提取 svg 的宽、高、viewBox等信息
+   * 颜色方案设置
+   * 提高运行时的效率
    */
   optimizeSvg(): FilesMap {
     const svgFiles = this.findSvg();
@@ -273,12 +286,3 @@ export default class Svg2js {
 }
 
 // // 如何去除项目没使用到的
-// (async () => {
-//   const svg2js = new Svg2js('src/assets', {
-//     outputFolder: 'static/svg2js',
-//   });
-
-//   svg2js.optimizeSvg();
-//   // svg2js.output();
-
-// })();

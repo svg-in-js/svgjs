@@ -20,5 +20,5 @@ const install = (Vue, option = {}) => {
 export default install;
 
 export {
-  SvgSymbolIcon
+  SvgSymbolIcon,
 }
