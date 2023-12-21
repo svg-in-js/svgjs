@@ -7,24 +7,27 @@ export default {
   input: 'src/index.js',
   output: [
     {
+      inlineDynamicImports: true,
       file: 'dist/svg-symbol-icon.cjs.js',
       format: 'cjs'
     },
     {
+      inlineDynamicImports: true,
       file: 'dist/svg-symbol-icon.es.js',
       format: 'es'
     },
     {
+      inlineDynamicImports: true,
       file: 'dist/svg-symbol-icon.umd.js',
       format: 'umd',
       name: 'SvgSymbolIcon',
     }
   ],
-  external: ['vue'],
+  external: ['vue', 'tippy.js'],
   plugins: [
     resolve({ extensions: ['.vue', '.jsx'] }),
     commonjs(),
     vue(),
-    babel()
+    babel(),
   ]
 }

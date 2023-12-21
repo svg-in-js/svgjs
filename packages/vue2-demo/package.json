@@ -18,11 +18,13 @@
     "babel-runtime": "^6.26.0",
     "glob": "^10.3.10",
     "svgo": "^3.0.3",
+    "tippy.js": "^6.3.7",
     "typeof": "link:babel-runtime/helpers/typeof",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {
+    "@svgjs/cli": "workspace:^",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.22.1",
     "babel-eslint": "^8.2.1",

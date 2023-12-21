@@ -3,19 +3,24 @@ import { optimize } from 'svgo';
 import { fse, resolveCWD } from '@all-in-js/utils';
 import { createSvgSpriteRuntimeJs } from './template/svg-sprite-runtime';
 import { createPreviewPage } from './template/preview-page';
+import { svgoPlugins } from './svgo-plugins';
 
 export type FilesMap = Map<string, ISvgData>;
-interface IOption {
+export interface IOption {
   nameSep?: string;
   spriteId?: string;
   outputFolder?: string;
   setFileName?: (filename: string, nameSep: IOption['nameSep']) => string;
 }
 
-interface ISvgData {
+export interface ISvgData {
   data: string;
   width?: string,
   height?: string;
+}
+
+interface IObject {
+  [key: string]: any;
 }
 
 const matchSvgTag = /<svg[^>]+>/;
@@ -32,7 +37,24 @@ const defaultOption: IOption = {
     return defaultFileName.replace(/\//g, nameSep || '');
   },
 };
+const singleColorReg = /<(?:path|rect|circle|polygon|line|polyline|ellipse).+?(?:fill|stroke)="([^"]+)"/gi;
+const ignorePathWithUrl = /<(path|rect|circle|polygon|line|polyline|ellipse).+?(fill|stroke)="url\([^"]+\)"/gi;
+const matchColor = /([^"]+)"$/;
+const mergeOption = (defaultOption: IObject, option: IObject) => {
+  const obj: IObject = {};
 
+  for (const key in option) {
+    const val = option[key];
+    if (val !== undefined) {
+      obj[key] = val;
+    }
+  }
+
+  return {
+    ...defaultOption,
+    ...obj,
+  }
+}
 /**
  * 通过脚本的方式，将项目中的 svg 文件进行压缩优化并生成一个 svg sprite
  */
@@ -52,10 +74,7 @@ export default class Svg2js {
     this.entryFolder = entryFolder || '.';
     this.compressPercentMap = new Map(); // 保存每个 svg 文件的压缩比率
     this.filesMap = new Map(); // 保存所有 svg 的基本信息
-    this.option = {
-      ...defaultOption,
-      ...(option || {}),
-    };
+    this.option = mergeOption(defaultOption, option || {});
   }
   /**
    * 从指定目录查找出所有的 svg 文件
@@ -76,6 +95,33 @@ export default class Svg2js {
     const files = globSync(`${entryFolder}/**/*.svg`);
   
     return files || [];
+  }
+  /**
+   * 将单色图标的 fill/stroke 替换为 'currentColor', 便于在使用时直接通过 css 的 color 属性来修改图标颜色
+   */
+  checkSingleColor(svgStr: string): string[] {
+    /**
+     * 单色图标: 
+     * 所有 path|rect|circle|polygon|line|polyline|ellipse 标签上设置的 fill|stroke 的值为同一个值
+     */
+    const matchElement: string[] | null = svgStr.match(singleColorReg);
+
+    if (!matchElement) return [];
+
+    // 忽略 fill/stroke 值为 url 格式的
+    if (svgStr.match(ignorePathWithUrl)) return [];
+
+    const colors: string[] = [];
+    
+    matchElement.forEach(item => {
+      const matchedColor = item.match(matchColor);
+
+      if (matchedColor) {
+        colors.push(matchedColor[1]);
+      }
+    });
+
+    return [...new Set(colors)];
   }
   /**
    * 将查找到的所有 svg 使用 svgo 进行压缩
@@ -107,44 +153,7 @@ export default class Svg2js {
       const buildSvg: ISvgData = optimize(svgStr, {
         path: svgFilePath,
         multipass: true,
-        plugins: [
-          'removeDoctype',
-          'removeXMLProcInst',
-          'removeComments',
-          'removeMetadata',
-          'removeEditorsNSData',
-          'cleanupAttrs',
-          'mergeStyles',
-          'inlineStyles',
-          'minifyStyles',
-          'cleanupIds', // 有在使用中的 ID 则进行 minify
-          'removeUselessDefs',
-          'cleanupNumericValues',
-          'convertColors',
-          'removeUnknownsAndDefaults',
-          'removeNonInheritableGroupAttrs',
-          'removeUselessStrokeAndFill',
-          // 'removeViewBox',
-          'cleanupEnableBackground',
-          'removeHiddenElems',
-          'removeEmptyText',
-          'convertShapeToPath',
-          'convertEllipseToCircle',
-          'moveElemsAttrsToGroup',
-          'moveGroupAttrsToElems',
-          'collapseGroups',
-          'convertPathData',
-          'convertTransform',
-          'removeEmptyAttrs',
-          'removeEmptyContainers',
-          'removeUnusedNS',
-          'mergePaths',
-          'sortAttrs',
-          'sortDefsChildren',
-          'removeTitle',
-          'removeDesc',
-          'prefixIds', // 配合 cleanupIds，在 minify ID 后再加上文件名作为前缀，防止不同文件 ID 重复
-        ],
+        plugins: svgoPlugins,
       });
 
       const [svgTag] = buildSvg.data.match(matchSvgTag) || [];
@@ -177,6 +186,19 @@ export default class Svg2js {
 
       // 移除默认的宽高，便于在使用 svg 时自定义宽高
       buildSvg.data = buildSvg.data.replace(matchSvgTag, svgTagStr => svgTagStr.replace(matchWidthReg, '').replace(matchHeightReg, ''));
+
+      // 将单色图标的颜色改为 currentColor, 便于在 css 中修改颜色
+      const [singleColor, secondColor] = this.checkSingleColor(buildSvg.data);
+
+      if (singleColor && !secondColor) {
+        buildSvg.data = buildSvg.data.replace(singleColorReg, (str, color) => {
+          if (color === singleColor) {
+            return str.replace(matchColor, 'currentColor"'); 
+          }
+
+          return str;
+        });
+      }
 
       const compressPercent = Math.round((1 - buildSvg.data.length / svgStr.length) * 100);
   

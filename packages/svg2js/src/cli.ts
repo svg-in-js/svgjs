@@ -78,7 +78,6 @@ function build(preview?: boolean) {
       outputFolder: argvs.outputFolder
     }
   );
-
   let svgs: FilesMap = new Map();
 
   try {

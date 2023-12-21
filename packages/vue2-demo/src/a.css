@@ -1,0 +1,6 @@
+:root {
+    --svg-symbol-icon-color: 'red';
+    --svg-symbol-icon-hover-color: '';
+    --svg-symbol-icon-actived-color: '';
+    --svg-symbol-icon-disabled-color: '#c5c8ce';
+  }

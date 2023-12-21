@@ -1,13 +1,13 @@
 export declare type FilesMap = Map<string, ISvgData>;
 
-declare interface IOption {
+export declare interface IOption {
     nameSep?: string;
     spriteId?: string;
     outputFolder?: string;
     setFileName?: (filename: string, nameSep: IOption['nameSep']) => string;
 }
 
-declare interface ISvgData {
+export declare interface ISvgData {
     data: string;
     width?: string;
     height?: string;
@@ -33,6 +33,10 @@ declare class Svg2js {
      * 从指定目录查找出所有的 svg 文件
      */
     findSvg(): string[];
+    /**
+     * 将单色图标的 fill/stroke 替换为 'currentColor', 便于在使用时直接通过 css 的 color 属性来修改图标颜色
+     */
+    checkSingleColor(svgStr: string): string[];
     /**
      * 将查找到的所有 svg 使用 svgo 进行压缩
      * 通过脚本提取 svg 的宽、高、viewBox、颜色值等信息，而不用在运行时做处理，提高运行时的效率

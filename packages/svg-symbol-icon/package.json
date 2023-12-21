@@ -1,5 +1,5 @@
 {
-  "name": "@svgjs/symbol-icon",
+  "name": "@svgjs/svg-symbol-icon",
   "version": "1.0.0",
   "description": "inline svg icon for latest vue",
   "main": "index.js",

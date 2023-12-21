@@ -112,6 +112,45 @@ function createPreviewPage(svgSpriteRuntime, svgsData, compressPercentObj) {
     return pageHtml;
 }
 
+const svgoPlugins = [
+    'removeDoctype',
+    'removeXMLProcInst',
+    'removeComments',
+    'removeMetadata',
+    'removeEditorsNSData',
+    'cleanupAttrs',
+    'mergeStyles',
+    'inlineStyles',
+    'minifyStyles',
+    'cleanupIds',
+    'removeUselessDefs',
+    'cleanupNumericValues',
+    'convertColors',
+    'removeUnknownsAndDefaults',
+    'removeNonInheritableGroupAttrs',
+    'removeUselessStrokeAndFill',
+    // 'removeViewBox',
+    'cleanupEnableBackground',
+    'removeHiddenElems',
+    'removeEmptyText',
+    'convertShapeToPath',
+    'convertEllipseToCircle',
+    'moveElemsAttrsToGroup',
+    'moveGroupAttrsToElems',
+    'collapseGroups',
+    'convertPathData',
+    'convertTransform',
+    'removeEmptyAttrs',
+    'removeEmptyContainers',
+    'removeUnusedNS',
+    'mergePaths',
+    'sortAttrs',
+    'sortDefsChildren',
+    'removeTitle',
+    'removeDesc',
+    'prefixIds', // 配合 cleanupIds，在 minify ID 后再加上文件名作为前缀，防止不同文件 ID 重复
+];
+
 const matchSvgTag = /<svg[^>]+>/;
 const matchWidthReg = /width="(\d+)"\s?/;
 const matchHeightReg = /height="(\d+)"\s?/;
@@ -125,6 +164,22 @@ const defaultOption = {
     setFileName(defaultFileName, nameSep) {
         return defaultFileName.replace(/\//g, nameSep || '');
     },
+};
+const singleColorReg = /<(?:path|rect|circle|polygon|line|polyline|ellipse).+?(?:fill|stroke)="([^"]+)"/gi;
+const ignorePathWithUrl = /<(path|rect|circle|polygon|line|polyline|ellipse).+?(fill|stroke)="url\([^"]+\)"/gi;
+const matchColor = /([^"]+)"$/;
+const mergeOption = (defaultOption, option) => {
+    const obj = {};
+    for (const key in option) {
+        const val = option[key];
+        if (val !== undefined) {
+            obj[key] = val;
+        }
+    }
+    return {
+        ...defaultOption,
+        ...obj,
+    };
 };
 /**
  * 通过脚本的方式，将项目中的 svg 文件进行压缩优化并生成一个 svg sprite
@@ -145,10 +200,7 @@ class Svg2js {
         this.entryFolder = entryFolder || '.';
         this.compressPercentMap = new Map(); // 保存每个 svg 文件的压缩比率
         this.filesMap = new Map(); // 保存所有 svg 的基本信息
-        this.option = {
-            ...defaultOption,
-            ...(option || {}),
-        };
+        this.option = mergeOption(defaultOption, option || {});
     }
     /**
      * 从指定目录查找出所有的 svg 文件
@@ -164,6 +216,29 @@ class Svg2js {
         }
         const files = globSync(`${entryFolder}/**/*.svg`);
         return files || [];
+    }
+    /**
+     * 将单色图标的 fill/stroke 替换为 'currentColor', 便于在使用时直接通过 css 的 color 属性来修改图标颜色
+     */
+    checkSingleColor(svgStr) {
+        /**
+         * 单色图标:
+         * 所有 path|rect|circle|polygon|line|polyline|ellipse 标签上设置的 fill|stroke 的值为同一个值
+         */
+        const matchElement = svgStr.match(singleColorReg);
+        if (!matchElement)
+            return [];
+        // 忽略 fill/stroke 值为 url 格式的
+        if (svgStr.match(ignorePathWithUrl))
+            return [];
+        const colors = [];
+        matchElement.forEach(item => {
+            const matchedColor = item.match(matchColor);
+            if (matchedColor) {
+                colors.push(matchedColor[1]);
+            }
+        });
+        return [...new Set(colors)];
     }
     /**
      * 将查找到的所有 svg 使用 svgo 进行压缩
@@ -189,44 +264,7 @@ class Svg2js {
             const buildSvg = optimize(svgStr, {
                 path: svgFilePath,
                 multipass: true,
-                plugins: [
-                    'removeDoctype',
-                    'removeXMLProcInst',
-                    'removeComments',
-                    'removeMetadata',
-                    'removeEditorsNSData',
-                    'cleanupAttrs',
-                    'mergeStyles',
-                    'inlineStyles',
-                    'minifyStyles',
-                    'cleanupIds',
-                    'removeUselessDefs',
-                    'cleanupNumericValues',
-                    'convertColors',
-                    'removeUnknownsAndDefaults',
-                    'removeNonInheritableGroupAttrs',
-                    'removeUselessStrokeAndFill',
-                    // 'removeViewBox',
-                    'cleanupEnableBackground',
-                    'removeHiddenElems',
-                    'removeEmptyText',
-                    'convertShapeToPath',
-                    'convertEllipseToCircle',
-                    'moveElemsAttrsToGroup',
-                    'moveGroupAttrsToElems',
-                    'collapseGroups',
-                    'convertPathData',
-                    'convertTransform',
-                    'removeEmptyAttrs',
-                    'removeEmptyContainers',
-                    'removeUnusedNS',
-                    'mergePaths',
-                    'sortAttrs',
-                    'sortDefsChildren',
-                    'removeTitle',
-                    'removeDesc',
-                    'prefixIds', // 配合 cleanupIds，在 minify ID 后再加上文件名作为前缀，防止不同文件 ID 重复
-                ],
+                plugins: svgoPlugins,
             });
             const [svgTag] = buildSvg.data.match(matchSvgTag) || [];
             if (!svgTag) {
@@ -254,6 +292,16 @@ class Svg2js {
             }
             // 移除默认的宽高，便于在使用 svg 时自定义宽高
             buildSvg.data = buildSvg.data.replace(matchSvgTag, svgTagStr => svgTagStr.replace(matchWidthReg, '').replace(matchHeightReg, ''));
+            // 将单色图标的颜色改为 currentColor, 便于在 css 中修改颜色
+            const [singleColor, secondColor] = this.checkSingleColor(buildSvg.data);
+            if (singleColor && !secondColor) {
+                buildSvg.data = buildSvg.data.replace(singleColorReg, (str, color) => {
+                    if (color === singleColor) {
+                        return str.replace(matchColor, 'currentColor"');
+                    }
+                    return str;
+                });
+            }
             const compressPercent = Math.round((1 - buildSvg.data.length / svgStr.length) * 100);
             this.compressPercentMap.set(filename, compressPercent);
             this.filesMap.set(filename, buildSvg);
