@@ -4,6 +4,7 @@
   "description": "svg icon for vue2.x",
   "module": "./dist/svg-symbol-icon.es.js",
   "main": "./dist/svg-symbol-icon.cjs.js",
+  "unpkg": "./dist/svg-symbol-icon.umd.js",
   "scripts": {
     "build": "rm -rf ./dist && rollup -c"
   },
