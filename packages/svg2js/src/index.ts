@@ -12,6 +12,7 @@ export interface ISvgData {
 }
 
 export type FilesMap = Map<string, ISvgData>;
+
 export interface IOption {
   nameSep?: string;
   spriteId?: string;
