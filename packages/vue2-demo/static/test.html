@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/vue@2.5.2/dist/vue.js"></script>
+  <script src="https://unpkg.com/@svgjs/vue2-symbol-icon@1.0.1/dist/svg-symbol-icon.umd.js"></script>
+  <script src="/static/svg-sprite.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    Vue.use(SvgSymbolIcon.default, {
+      name: 'icon',
+    });
+
+    new Vue({
+      template: `
+        <icon name="svg/zuoyi_icon"></icon>
+      `,
+    }).$mount('#app');
+  </script>
+</body>
+</html>

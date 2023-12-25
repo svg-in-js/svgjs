@@ -7,6 +7,17 @@
       <use xlink:href="#svg-workshop-tmap-logo"></use>
     </svg> -->
     <svg-symbol-icon :tooltip="tooltip" :name="name" size="18" />
+    <svg>
+      <rect x="25" y="25"  width="200" height="5" rx="3" fill="pink" class="load-bar"></rect>
+    </svg>
+    <svg>
+    <polyline
+    points="0,40 40,10 40,80 80,30 80,120 120,20 120,60"
+    fill="white" 
+    stroke="red" 
+    stroke-width="4"
+    ></polyline>
+</svg>
   </div>
 </template>
 
@@ -53,5 +64,16 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   margin-top: 60px;
+}
+.load-bar {
+  animation: loading 1.5s ease-in-out;
+}
+@keyframes loading {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 200px;
+  }
 }
 </style>

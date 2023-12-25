@@ -20,5 +20,6 @@ const install = (Vue, option = {}) => {
 export default install;
 
 export {
+  setGlobalOption,
   SvgSymbolIcon,
 }

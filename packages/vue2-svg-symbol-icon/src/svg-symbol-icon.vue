@@ -58,6 +58,7 @@ export default {
     disabled: Boolean,
     /**
      * 支持使用 tippy.js 来为图标提供丰富的 tooltip 效果
+     * 默认不对其进行初始化
      */
     tooltip: [String, Object],
     /**
@@ -140,6 +141,7 @@ export default {
       let arr = []
       const { color, hoverColor, activedColor, disabledColor, disabled, size, sizeUnit } = this;
       const style = {};
+      // 设置宽高
       const sizeType = typeof size;
 
       if (['number', 'string'].includes(sizeType)) {
@@ -153,12 +155,13 @@ export default {
       style.width = `${parseInt(arr[0], 10)}${sizeUnit}`;
       style.height = `${parseInt(arr[1], 10)}${sizeUnit}`;
 
-      // 设置 flip
+      // 设置横向翻转
       const flipStyle = [];
       if (this.flipH) {
         flipStyle.push('scaleX(-1)');
       }
 
+      // 设置纵向翻转
       if (this.flipV) {
         flipStyle.push('scaleY(-1)');
       }
@@ -167,18 +170,22 @@ export default {
         style.transform = flipStyle.join(' ');
       }
 
+      // 设置默认颜色
       if (color) {
         style[defaultColorKey] = color;
       }
 
+      // 设置鼠标 hover 时的颜色
       if (hoverColor) {
         style[hoverColorKey] = hoverColor;
       }
 
+      // 设置鼠标按下时的颜色
       if (activedColor) {
         style[activedColorKey] = activedColor;
       }
 
+      // 设置禁用时的颜色
       if (disabledColor && disabled) {
         style[disabledColorKey] = disabledColor;
       }
@@ -187,6 +194,7 @@ export default {
     }
   },
   mounted() {
+    // 如果设置了 tooltip, 则初始化 tippy
     if (this.tooltip) {
       const tipOption = this.fmtTooltipOption(this.tooltip);
 
@@ -219,7 +227,7 @@ export default {
     handleClick (e) {
       if (this.disabled) return;
 
-      this.$emit('click', e);
+      this.$emit('on-click', e);
     }
   }
 }
