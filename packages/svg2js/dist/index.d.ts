@@ -11,10 +11,17 @@ export declare interface ISvgData {
     data: string;
     width?: string;
     height?: string;
+    filename?: string;
 }
 
 /**
- * 通过脚本的方式，将项目中的 svg 文件进行压缩优化并生成一个 svg sprite
+ * 工具提供以下几个功能：
+ * 1. 优化图标
+ * 2. 提取图标的关键信息
+ * 3. 颜色方案设置
+ * 4. 创建 svg-sprite
+ * 5. 预览图标
+ * 6. 插件机制：自定义处理
  */
 declare class Svg2js {
     entryFolder: string;
@@ -34,14 +41,16 @@ declare class Svg2js {
      */
     findSvg(): string[];
     /**
-     * 将单色图标的 fill/stroke 替换为 'currentColor', 便于在使用时直接通过 css 的 color 属性来修改图标颜色
-     */
-    checkSingleColor(svgStr: string): string[];
-    /**
-     * 将查找到的所有 svg 使用 svgo 进行压缩
-     * 通过脚本提取 svg 的宽、高、viewBox、颜色值等信息，而不用在运行时做处理，提高运行时的效率
+     * 将查找到的所有 svg 使用 svgo 进行优化
+     * 通过脚本提取 svg 的宽、高、viewBox等信息
+     * 颜色方案设置
+     * 提高运行时的效率
      */
     optimizeSvg(): FilesMap;
+    /**
+     * 组合调用插件
+     */
+    compose(data: ISvgData, filename: string): ISvgData;
     /**
      * 生成 svgSprite
      */

@@ -2,8 +2,8 @@
 'use strict';
 
 var parser = require('yargs-parser');
-var Svg2js = require('./index');
 var utils = require('@all-in-js/utils');
+var Svg2js = require('./index');
 var pkg = require('../package.json');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e["default"] : e; }

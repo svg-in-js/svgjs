@@ -1,8 +1,8 @@
 'use strict';
 
+var utils = require('@all-in-js/utils');
 var glob = require('glob');
 var svgo = require('svgo');
-var utils = require('@all-in-js/utils');
 
 function createSvgSpriteRuntimeJs(spriteId, svgSymbols, svgXMLNs) {
     const runtimeJs = `document.addEventListener('DOMContentLoaded', function() {
@@ -153,24 +153,92 @@ const svgoPlugins = [
     'prefixIds', // 配合 cleanupIds，在 minify ID 后再加上文件名作为前缀，防止不同文件 ID 重复
 ];
 
+const matchSvgTag$1 = /<svg[^>]+>/;
+const matchWidthReg$1 = /width="(\d+)"\s?/;
+const matchHeightReg$1 = /height="(\d+)"\s?/;
+const matchViewbox = /viewBox="([\s\d]+)"/;
+function collectInfo(svgData) {
+    let [svgTag] = svgData.data.match(matchSvgTag$1) || [];
+    if (!svgTag) {
+        svgTag = '';
+    }
+    // 保留原始的宽高，作为组件内的默认值
+    const [, matchWidth] = svgTag.match(matchWidthReg$1) || [];
+    const [, matchHeight] = svgTag.match(matchHeightReg$1) || [];
+    let [, viewBox] = svgTag.match(matchViewbox) || [];
+    let viewBoxW, viewBoxH;
+    if (viewBox) {
+        [, , viewBoxW, viewBoxH] = viewBox.split(/\s/);
+    }
+    if (matchWidth) {
+        svgData.width = matchWidth;
+    }
+    else if (viewBoxW) {
+        svgData.width = viewBoxW;
+    }
+    if (matchHeight) {
+        svgData.height = matchHeight;
+    }
+    else if (viewBoxH) {
+        svgData.height = viewBoxH;
+    }
+    return svgData;
+}
+
 const matchSvgTag = /<svg[^>]+>/;
 const matchWidthReg = /width="(\d+)"\s?/;
 const matchHeightReg = /height="(\d+)"\s?/;
-const matchViewbox = /viewBox="([\s\d]+)"/;
-const svgXMLNs = 'http://www.w3.org/2000/svg';
-const xmlns = `xmlns="${svgXMLNs}"`;
-const defaultOption = {
-    nameSep: '-',
-    spriteId: 'svg_sprite_created_by_svg2js',
-    outputFolder: 'svg2js-preview',
-    setFileName(defaultFileName, nameSep) {
-        return defaultFileName.replace(/\//g, nameSep || '');
-    },
-};
+// 移除默认的宽高，便于在使用 svg 时自定义宽高
+function removeWidthHeight(svgData) {
+    svgData.data = svgData.data.replace(matchSvgTag, svgTagStr => svgTagStr.replace(matchWidthReg, '').replace(matchHeightReg, ''));
+    return svgData;
+}
+
 const singleColorReg = /<(?:path|rect|circle|polygon|line|polyline|ellipse).+?(?:fill|stroke)="([^"]+)"/gi;
 const ignorePathWithUrl = /<(path|rect|circle|polygon|line|polyline|ellipse).+?(fill|stroke)="url\([^"]+\)"/gi;
 const matchColor = /([^"]+)"$/;
-const mergeOption = (defaultOption, option) => {
+/**
+   * 将单色图标的 fill/stroke 替换为 'currentColor', 便于在使用时直接通过 css 的 color 属性来修改图标颜色
+   */
+const checkSingleColor = (svgStr) => {
+    /**
+     * 单色图标:
+     * 所有 path|rect|circle|polygon|line|polyline|ellipse 标签上设置的 fill|stroke 的值为同一个值
+     */
+    const matchElement = svgStr.match(singleColorReg);
+    if (!matchElement)
+        return [];
+    // 忽略 fill/stroke 值为 url 格式的
+    if (svgStr.match(ignorePathWithUrl))
+        return [];
+    const colors = [];
+    matchElement.forEach(item => {
+        const matchedColor = item.match(matchColor);
+        if (matchedColor) {
+            colors.push(matchedColor[1]);
+        }
+    });
+    return [...new Set(colors)];
+};
+// 将单色图标的颜色改为 currentColor, 便于在 css 中修改颜色
+function replaceSingleColor(svgData) {
+    const [singleColor, secondColor] = checkSingleColor(svgData.data);
+    if (singleColor && !secondColor) {
+        svgData.data = svgData.data.replace(singleColorReg, (str, color) => {
+            if (color === singleColor) {
+                return str.replace(matchColor, 'currentColor"');
+            }
+            return str;
+        });
+    }
+    return svgData;
+}
+
+/**
+ * Object.assign 做合并时，如果传入的值为 undefined 也会替换原有的值
+ * 此处兼容不传值或者值为 undefined 时，不做 merge 操作，使用原值
+ */
+function mergeOption(defaultOption, option) {
     const obj = {};
     for (const key in option) {
         const val = option[key];
@@ -182,9 +250,33 @@ const mergeOption = (defaultOption, option) => {
         ...defaultOption,
         ...obj,
     };
+}
+function compose(fnArr) {
+    if (!fnArr.length)
+        return s => s;
+    return (svgData) => {
+        return fnArr.reduce((cur, fn) => fn.call(null, cur), svgData);
+    };
+}
+
+const svgXMLNs = 'http://www.w3.org/2000/svg';
+const xmlns = `xmlns="${svgXMLNs}"`;
+const defaultOption = {
+    nameSep: '-',
+    spriteId: 'svg_sprite_created_by_svg2js',
+    outputFolder: 'svg2js-preview',
+    setFileName(defaultFileName, nameSep) {
+        return defaultFileName.replace(/\//g, nameSep || '');
+    },
 };
 /**
- * 通过脚本的方式，将项目中的 svg 文件进行压缩优化并生成一个 svg sprite
+ * 工具提供以下几个功能：
+ * 1. 优化图标
+ * 2. 提取图标的关键信息
+ * 3. 颜色方案设置
+ * 4. 创建 svg-sprite
+ * 5. 预览图标
+ * 6. 插件机制：自定义处理
  */
 class Svg2js {
     entryFolder;
@@ -220,31 +312,10 @@ class Svg2js {
         return files || [];
     }
     /**
-     * 将单色图标的 fill/stroke 替换为 'currentColor', 便于在使用时直接通过 css 的 color 属性来修改图标颜色
-     */
-    checkSingleColor(svgStr) {
-        /**
-         * 单色图标:
-         * 所有 path|rect|circle|polygon|line|polyline|ellipse 标签上设置的 fill|stroke 的值为同一个值
-         */
-        const matchElement = svgStr.match(singleColorReg);
-        if (!matchElement)
-            return [];
-        // 忽略 fill/stroke 值为 url 格式的
-        if (svgStr.match(ignorePathWithUrl))
-            return [];
-        const colors = [];
-        matchElement.forEach(item => {
-            const matchedColor = item.match(matchColor);
-            if (matchedColor) {
-                colors.push(matchedColor[1]);
-            }
-        });
-        return [...new Set(colors)];
-    }
-    /**
-     * 将查找到的所有 svg 使用 svgo 进行压缩
-     * 通过脚本提取 svg 的宽、高、viewBox、颜色值等信息，而不用在运行时做处理，提高运行时的效率
+     * 将查找到的所有 svg 使用 svgo 进行优化
+     * 通过脚本提取 svg 的宽、高、viewBox等信息
+     * 颜色方案设置
+     * 提高运行时的效率
      */
     optimizeSvg() {
         const svgFiles = this.findSvg();
@@ -263,52 +334,38 @@ class Svg2js {
             else if (typeof setFileName === 'function') {
                 filename = setFileName(filename, nameSep);
             }
-            const buildSvg = svgo.optimize(svgStr, {
+            let buildSvg = svgo.optimize(svgStr, {
                 path: svgFilePath,
                 multipass: true,
                 plugins: svgoPlugins,
             });
-            const [svgTag] = buildSvg.data.match(matchSvgTag) || [];
-            if (!svgTag) {
-                throw new Error('invalid svg content.');
-            }
-            // 保留原始的宽高，作为组件内的默认值
-            const [, matchWidth] = svgTag.match(matchWidthReg) || [];
-            const [, matchHeight] = svgTag.match(matchHeightReg) || [];
-            let [, viewBox] = svgTag.match(matchViewbox) || [];
-            let viewBoxW, viewBoxH;
-            if (viewBox) {
-                [, , viewBoxW, viewBoxH] = viewBox.split(/\s/);
-            }
-            if (matchWidth) {
-                buildSvg.width = matchWidth;
-            }
-            else if (viewBoxW) {
-                buildSvg.width = viewBoxW;
-            }
-            if (matchHeight) {
-                buildSvg.height = matchHeight;
-            }
-            else if (viewBoxH) {
-                buildSvg.height = viewBoxH;
-            }
-            // 移除默认的宽高，便于在使用 svg 时自定义宽高
-            buildSvg.data = buildSvg.data.replace(matchSvgTag, svgTagStr => svgTagStr.replace(matchWidthReg, '').replace(matchHeightReg, ''));
-            // 将单色图标的颜色改为 currentColor, 便于在 css 中修改颜色
-            const [singleColor, secondColor] = this.checkSingleColor(buildSvg.data);
-            if (singleColor && !secondColor) {
-                buildSvg.data = buildSvg.data.replace(singleColorReg, (str, color) => {
-                    if (color === singleColor) {
-                        return str.replace(matchColor, 'currentColor"');
-                    }
-                    return str;
-                });
-            }
+            /**
+             * 通过插件机制，支持自定义一些额外的处理
+             * example:
+             *  const myPlugin = (svgData) => {
+             *    svgData.filename = uid(svgData.filename);
+             *    return svgData;
+             *  }
+             */
+            buildSvg = this.compose(buildSvg, filename);
             const compressPercent = Math.round((1 - buildSvg.data.length / svgStr.length) * 100);
             this.compressPercentMap.set(filename, compressPercent);
             this.filesMap.set(filename, buildSvg);
         });
         return this.filesMap;
+    }
+    /**
+     * 组合调用插件
+     */
+    compose(data, filename) {
+        return compose([
+            collectInfo,
+            removeWidthHeight,
+            replaceSingleColor,
+        ])({
+            ...data,
+            filename,
+        });
     }
     /**
      * 生成 svgSprite
@@ -365,12 +422,5 @@ class Svg2js {
     }
 }
 // // 如何去除项目没使用到的
-// (async () => {
-//   const svg2js = new Svg2js('src/assets', {
-//     outputFolder: 'static/svg2js',
-//   });
-//   svg2js.optimizeSvg();
-//   // svg2js.output();
-// })();
 
 module.exports = Svg2js;
