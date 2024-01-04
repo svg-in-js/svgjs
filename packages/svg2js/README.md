@@ -16,8 +16,8 @@
 1. no build、no config，无构建时的相关配置，比如 svg-sprite-loader
 2. 可在需要时执行一个命令即可将项目中的 svg 图标进行优化处理，一般可大大降低文件体积
 3. 随时预览和管理项目中所有的图标
-4. 组件化 svg 图标
-5. 通过脚本的方式，提前优化图标、提取关键信息、颜色处理等，避免 inline svg 模式下在运行时做这些处理，可提高运行效率
+4. 通过脚本的方式，提前优化图标、提取关键信息、颜色处理等，避免 inline svg 模式下在运行时做这些处理，可提高运行效率
+5. 更优雅的 svg 颜色控制方案
 
 ## Usage
 
@@ -52,6 +52,34 @@ npm i -D @svgjs/cli
 ```
 
 将 src/assets 目录下的 svg 图标进行优化处理后生成一个 html 页面，打开即可预览项目中的所有图标，项目中图标文件较多时比较方便找图标
+
+### 作为依赖包开发应用
+
+```js
+import Svg2js from '@svgjs/cli';
+
+const svg2js = new Svg2js(entryFolder, option);
+```
+
+
+* **entryFolder** `string` svg 文件的入口目录，相对目录，不能是 `.` `/` `\` 开头
+* **option** 
+
+| 名称 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| nameSep | string | - | 当目录中存在多层文件夹时，为了避免不同目录中文件重名，默认会将目录名作为前缀，用于设置文件夹之间的分隔符 |
+| spriteId | string | svg_sprite_created_by_svg2js | 生成 svg-sprite 时用来设置其 id |
+| outputFolder | string | svg2js-preview | 设置生成的文件所在的目录 |
+| plugins | array | [] | 可以通过插件对每个 svg 进行额外的一些处理 |
+| setFileName | function(defaultFileName, nameSep) | -- | 设置文件名 |
+
+* **核心函数**
+
+  - **svg2js.addPlugin(plugin)** 添加用于处理 svg 文件的插件
+  - **svg2js.optimizeSvg()** 查找 svg 文件并一一进行处理
+  - **svg2js.outputSpriteJS()** 生成一个包含所有 svg 的 svg-sprite 文件，导入到项目中可直接使用
+  - **svg2js.outputPreviewHtml()** 生成一个点击即可预览的 html 页面
+
 
 ## 预处理：运行时提效
 

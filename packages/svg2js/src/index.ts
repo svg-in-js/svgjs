@@ -7,13 +7,13 @@ import { svgoPlugins } from './svgo-plugins';
 import { collectInfo } from './plugin/collect-info';
 import { removeWidthHeight } from './plugin/remove-width-height';
 import { replaceSingleColor } from './plugin/replace-single-color';
-import { compose, mergeOption } from './util';
+import { compose, mergeOption, PlubinFn } from './util';
 
 export interface ISvgData {
   data: string;
   width?: string;
   height?: string;
-  filename?: string;
+  filename: string;
 }
 
 export type FilesMap = Map<string, ISvgData>;
@@ -22,6 +22,7 @@ export interface IOption {
   nameSep?: string;
   spriteId?: string;
   outputFolder?: string;
+  plugins?: PlubinFn<ISvgData>[],
   setFileName?: (filename: string, nameSep: IOption['nameSep']) => string;
 }
 
@@ -31,6 +32,7 @@ const defaultOption: IOption = {
   nameSep: '-',
   spriteId: 'svg_sprite_created_by_svg2js',
   outputFolder: 'svg2js-preview',
+  plugins: [],
   setFileName(defaultFileName, nameSep) {
     return defaultFileName.replace(/\//g, nameSep || '');
   },
@@ -75,7 +77,7 @@ export default class Svg2js {
       throw new Error('please set an exists entry folder.');
     }
   
-    if (entryFolder.startsWith('.') || entryFolder.startsWith('/')) {
+    if (entryFolder.startsWith('.') || entryFolder.startsWith('/') || entryFolder.startsWith('\\')) {
       throw new Error('please set entry folder start with a folder name.');
     }
   
@@ -112,11 +114,16 @@ export default class Svg2js {
         filename = setFileName(filename, nameSep);
       }
       
-      let buildSvg: ISvgData = optimize(svgStr, {
+      const buildOutput = optimize(svgStr, {
         path: svgFilePath,
         multipass: true,
         plugins: svgoPlugins,
       });
+
+      let buildSvg = {
+        ...buildOutput,
+        filename,
+      };
 
       /**
        * 通过插件机制，支持自定义一些额外的处理
@@ -126,28 +133,35 @@ export default class Svg2js {
        *    return svgData;
        *  }
        */
-      buildSvg = this.compose(buildSvg, filename);
+      buildSvg = this.compose(buildSvg);
 
       const compressPercent = Math.round((1 - buildSvg.data.length / svgStr.length) * 100);
   
-      this.compressPercentMap.set(filename, compressPercent);
-      this.filesMap.set(filename, buildSvg);
+      this.compressPercentMap.set(buildSvg.filename, compressPercent);
+      this.filesMap.set(buildSvg.filename, buildSvg);
     });
 
     return this.filesMap;
   }
+  addPlugin(plugin: PlubinFn<ISvgData>) {
+    if (Array.isArray(this.option.plugins)) {
+      this.option.plugins.push(plugin);
+    }
+
+    return this;
+  }
   /**
    * 组合调用插件
    */
-  compose(data: ISvgData, filename: string): ISvgData {
+  compose(data: ISvgData): ISvgData {
+    const { plugins = [] } = this.option;
+
     return compose<ISvgData>([
       collectInfo,
       removeWidthHeight,
       replaceSingleColor,
-    ])({
-      ...data,
-      filename,
-    });
+      ...plugins,
+    ])(data);
   }
   /**
    * 生成 svgSprite

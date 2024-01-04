@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <router-view/>
+    <!-- <img :src="logo" data-id="123" /> -->
     <br>
     svg preview:
     <!-- <svg style="width:77px;height:20px" data-id="s-1">
@@ -25,6 +26,7 @@
 import Vue from 'vue';
 import svgSymbolIcon from '@svgjs/vue2-symbol-icon';
 import 'tippy.js/dist/tippy.css';
+// import logo from './assets/logo.png';
 // import 'tippy.js/themes/light.css';
 
 // console.log(SvgSymbolIcon)
@@ -41,6 +43,7 @@ export default {
     return {
       name: '',
       tooltip: 'add',
+      logo,
     }
   },
   mounted() {
