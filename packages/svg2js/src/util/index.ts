@@ -22,9 +22,9 @@ export function mergeOption(defaultOption: IObject, option: IObject) {
   }
 }
 
-export type PlubinFn<T> = (data: T) => T;
+export type PluginFn<T> = (data: T) => T;
 
-export function compose<T>(fnArr: PlubinFn<T>[]): PlubinFn<T> {
+export function compose<T>(fnArr: PluginFn<T>[]): PluginFn<T> {
   if (!fnArr.length) return s => s;
 
   return (svgData: T): T => {

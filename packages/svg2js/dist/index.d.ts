@@ -4,7 +4,7 @@ export declare interface IOption {
     nameSep?: string;
     spriteId?: string;
     outputFolder?: string;
-    plugins?: PlubinFn<ISvgData>[];
+    plugins?: PluginFn<ISvgData>[];
     setFileName?: (filename: string, nameSep: IOption['nameSep']) => string;
 }
 
@@ -15,7 +15,7 @@ export declare interface ISvgData {
     filename: string;
 }
 
-declare type PlubinFn<T> = (data: T) => T;
+declare type PluginFn<T> = (data: T) => T;
 
 /**
  * 工具提供以下几个功能：
@@ -50,7 +50,7 @@ declare class Svg2js {
      * 提高运行时的效率
      */
     optimizeSvg(): FilesMap;
-    addPlugin(plugin: PlubinFn<ISvgData>): this;
+    addPlugin(plugin: PluginFn<ISvgData>): this;
     /**
      * 组合调用插件
      */

@@ -7,7 +7,7 @@ import { svgoPlugins } from './svgo-plugins';
 import { collectInfo } from './plugin/collect-info';
 import { removeWidthHeight } from './plugin/remove-width-height';
 import { replaceSingleColor } from './plugin/replace-single-color';
-import { compose, mergeOption, PlubinFn } from './util';
+import { compose, mergeOption, PluginFn } from './util';
 
 export interface ISvgData {
   data: string;
@@ -22,7 +22,7 @@ export interface IOption {
   nameSep?: string;
   spriteId?: string;
   outputFolder?: string;
-  plugins?: PlubinFn<ISvgData>[],
+  plugins?: PluginFn<ISvgData>[],
   setFileName?: (filename: string, nameSep: IOption['nameSep']) => string;
 }
 
@@ -143,7 +143,7 @@ export default class Svg2js {
 
     return this.filesMap;
   }
-  addPlugin(plugin: PlubinFn<ISvgData>) {
+  addPlugin(plugin: PluginFn<ISvgData>) {
     if (Array.isArray(this.option.plugins)) {
       this.option.plugins.push(plugin);
     }
