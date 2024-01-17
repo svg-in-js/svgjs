@@ -1,6 +1,6 @@
 {
   "name": "@svgjs/vue-symbol-icon",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "svg icon for vue@latest",
   "module": "./dist/svg-symbol-icon.es.js",
   "main": "./dist/svg-symbol-icon.es.js",
@@ -15,6 +15,10 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/svg-in-js/svgjs"
   },
   "author": "famanoder",
   "license": "ISC",
