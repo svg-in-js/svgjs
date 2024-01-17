@@ -7,7 +7,7 @@ import { svgoPlugins } from './svgo-plugins';
 import { collectInfo } from './plugin/collect-info';
 import { removeWidthHeight } from './plugin/remove-width-height';
 import { replaceSingleColor } from './plugin/replace-single-color';
-import { compose, mergeOption, PluginFn } from './util';
+import { compose, formatFilename, mergeOption, PluginFn } from './util';
 
 export interface ISvgData {
   data: string;
@@ -106,7 +106,7 @@ export default class Svg2js {
           encoding: 'utf-8',
         }
       ).toString();
-      let filename = svgFilePath.replace(`${entryFolder}/`, '').replace(/\.svg$/, '');
+      let { compatiblePath, filename } = formatFilename(svgFilePath, entryFolder);
 
       if (nameSep !== undefined && !setFileName) {
         filename = filename.replace(/\//g, nameSep);
@@ -115,7 +115,7 @@ export default class Svg2js {
       }
       
       const buildOutput = optimize(svgStr, {
-        path: svgFilePath,
+        path: compatiblePath,
         multipass: true,
         plugins: svgoPlugins,
       });

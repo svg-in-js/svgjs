@@ -20,7 +20,7 @@ export default {
       inlineDynamicImports: true,
       file: 'dist/svg-symbol-icon.umd.js',
       format: 'umd',
-      name: 'SvgSymbolIcon',
+      name: 'SymbolIcon',
     }
   ],
   external: ['vue', 'tippy.js'],

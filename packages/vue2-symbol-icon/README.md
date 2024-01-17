@@ -81,6 +81,9 @@ setGlobalOption({
 | activedColor | string | -- | 设置鼠标按下时的颜色，会覆盖全局设置的 activedColor |
 | tooltip | string, object | -- | 设置 tooltip |
 
+
+> 使用 tooltip 时需要独立引入 tippy 的样式文件：`import 'tippy.js/dist/tippy.css'`
+
 * 事件
 
 | 事件名 | 说明 |

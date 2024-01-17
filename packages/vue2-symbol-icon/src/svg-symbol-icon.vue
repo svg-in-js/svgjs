@@ -148,7 +148,7 @@ export default {
         arr = [size, size];
       }
 
-      if (Array.isArray(sizeType)) {
+      if (Array.isArray(size)) {
         arr = size;
       }
 
@@ -219,7 +219,7 @@ export default {
       return tipOption;
     },
     destroyTooltip() {
-      if (tooltipInstance) {
+      if (this.tooltipInstance) {
         this.tooltipInstance.destroy();
         this.tooltipInstance = null;
       }

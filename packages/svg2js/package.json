@@ -1,6 +1,6 @@
 {
   "name": "@svgjs/cli",
-  "version": "1.1.7",
+  "version": "1.1.9",
   "description": "",
   "main": "dist/index.es.js",
   "module": "dist/index.es.js",
@@ -16,7 +16,10 @@
     "build": "rm -rf dist && node ./build.js",
     "prepublishOnly": "rm -rf dist && npm run build"
   },
-  "keywords": ["svg2js", "svgjs"],
+  "keywords": [
+    "svg2js",
+    "svgjs"
+  ],
   "author": "famanoder",
   "license": "ISC",
   "devDependencies": {
@@ -27,6 +30,7 @@
     "chalk": "^3.0.0",
     "execa": "^3.4.0",
     "fs-extra": "^8.1.0",
+    "open": "^10.0.3",
     "rollup": "^2.27.1",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.4.0",

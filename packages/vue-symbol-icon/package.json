@@ -1,12 +1,36 @@
 {
   "name": "@svgjs/vue-symbol-icon",
   "version": "1.0.0",
-  "description": "svg icon for latest vue",
-  "main": "index.js",
+  "description": "svg icon for vue@latest",
+  "module": "./dist/svg-symbol-icon.es.js",
+  "main": "./dist/svg-symbol-icon.es.js",
+  "unpkg": "./dist/svg-symbol-icon.es.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rm -rf ./dist && rollup -c"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": [
+    "svg",
+    "icon"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "author": "famanoder",
+  "license": "ISC",
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.5.2",
+    "@vue/babel-preset-jsx": "^1.4.0",
+    "@vue/tsconfig": "^0.5.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-typescript2": "^0.27.2",
+    "rollup-plugin-vue": "^6.0.0"
+  },
+  "dependencies": {
+    "tippy.js": "^6.3.7"
+  },
+  "peerDependencies": {
+    "tippy.js": "^6.3.7"
+  }
 }

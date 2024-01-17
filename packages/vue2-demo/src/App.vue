@@ -7,7 +7,7 @@
     <!-- <svg style="width:77px;height:20px" data-id="s-1">
       <use xlink:href="#svg-workshop-tmap-logo"></use>
     </svg> -->
-    <svg-symbol-icon :tooltip="tooltip" :name="name" size="18" />
+    <svg-symbol-icon :tooltip="tooltip" :name="name" :size="[18, 20]" />
     <svg>
       <rect x="25" y="25"  width="200" height="5" rx="3" fill="pink" class="load-bar"></rect>
     </svg>
@@ -43,7 +43,6 @@ export default {
     return {
       name: '',
       tooltip: 'add',
-      logo,
     }
   },
   mounted() {

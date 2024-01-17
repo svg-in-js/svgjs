@@ -1,3 +1,4 @@
+import open from 'open';
 import parser from 'yargs-parser';
 import { Spinner, log, c } from '@all-in-js/utils';
 import Svg2js, { FilesMap } from './index';
@@ -94,6 +95,10 @@ function build(preview?: boolean) {
 
   log.info(`There are ${c.cyan(svgs.size)} svg files has found and optimized.`, CLI_NAME);
   log.info(`Output: ${outputFile}`, CLI_NAME);
+
+  if (preview) {
+    open(outputFile);
+  }
 }
 
 function run() {

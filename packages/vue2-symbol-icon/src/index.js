@@ -14,7 +14,7 @@ const install = (Vue, option = {}) => {
     placeholderColor: option.placeholderColor,
   });
 
-  Vue.component(option.name || 'SvgSymbolIcon', SvgSymbolIcon);
+  Vue.component(option.name || 'SymbolIcon', SvgSymbolIcon);
 };
 
 export default install;

@@ -31,3 +31,13 @@ export function compose<T>(fnArr: PluginFn<T>[]): PluginFn<T> {
     return fnArr.reduce((cur, fn) => fn.call(null, cur), svgData);
   }
 }
+
+export function formatFilename(filePath: string, entryFolder: string) {
+  const compatiblePath = filePath.replace(/\\/g, '/');
+  const filename = compatiblePath.replace(`${entryFolder}/`, '').replace(/\.svg$/, '');
+
+  return {
+    compatiblePath,
+    filename,
+  }
+}

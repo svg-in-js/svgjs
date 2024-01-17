@@ -9,7 +9,7 @@ function createSvgSpriteRuntimeJs(spriteId, svgSymbols, svgXMLNs) {
   const svgWrapperEl = document.createElement('div');
 
   svgWrapperEl.id = '${spriteId}';
-  svgWrapperEl.style = 'position: absolute; width: 0; height: 0;';
+  svgWrapperEl.style = 'position: absolute; width: 0; height: 0; overflow: hidden;';
   svgWrapperEl.setAttribute('aria-hidden', true);
   svgWrapperEl.innerHTML = \`<svg xmlns="${svgXMLNs}">${svgSymbols.join('')}</svg>\`;
 
@@ -39,6 +39,7 @@ function createPreviewPage(svgSpriteRuntime, svgsData, compressPercentObj) {
         overflow: hidden;
         font-size: 12px;
         color: #4b4848;
+        background: #fafafa;
       }
       #app {
         display: flex;
@@ -56,6 +57,7 @@ function createPreviewPage(svgSpriteRuntime, svgsData, compressPercentObj) {
         flex: 1;
         overflow: auto;
         padding: 10px;
+        background: #f1f2f2;
       }
       .svg {
         display: inline-block;
@@ -142,7 +144,7 @@ function createPreviewPage(svgSpriteRuntime, svgsData, compressPercentObj) {
         const svgItem = (filename, data, percent) => {
           return \`<div class="svg" onclick="copy('\${filename}')">
             <svg style="width: \${data.width}px; height: \${data.height}px"><use xlink:href="#\${filename}"></use></svg>
-            <p>\${filename}</p>
+            <p>文件名: \${filename}</p>
             <p>压缩率: \${percent}%</p>
           </div>\`;
         }
@@ -323,6 +325,14 @@ function compose(fnArr) {
         return fnArr.reduce((cur, fn) => fn.call(null, cur), svgData);
     };
 }
+function formatFilename(filePath, entryFolder) {
+    const compatiblePath = filePath.replace(/\\/g, '/');
+    const filename = compatiblePath.replace(`${entryFolder}/`, '').replace(/\.svg$/, '');
+    return {
+        compatiblePath,
+        filename,
+    };
+}
 
 const svgXMLNs = 'http://www.w3.org/2000/svg';
 const xmlns = `xmlns="${svgXMLNs}"`;
@@ -393,7 +403,7 @@ class Svg2js {
             const svgStr = utils.fse.readFileSync(utils.resolveCWD(svgFilePath), {
                 encoding: 'utf-8',
             }).toString();
-            let filename = svgFilePath.replace(`${entryFolder}/`, '').replace(/\.svg$/, '');
+            let { compatiblePath, filename } = formatFilename(svgFilePath, entryFolder);
             if (nameSep !== undefined && !setFileName) {
                 filename = filename.replace(/\//g, nameSep);
             }
@@ -401,7 +411,7 @@ class Svg2js {
                 filename = setFileName(filename, nameSep);
             }
             const buildOutput = svgo.optimize(svgStr, {
-                path: svgFilePath,
+                path: compatiblePath,
                 multipass: true,
                 plugins: svgoPlugins,
             });
