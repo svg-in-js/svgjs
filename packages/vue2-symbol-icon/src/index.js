@@ -17,7 +17,7 @@ const install = (Vue, option = {}) => {
   Vue.component(option.name || 'SymbolIcon', SvgSymbolIcon);
 };
 
-export default install;
+export default { install };
 
 export {
   setGlobalOption,

@@ -1,16 +1,11 @@
 <script setup lang="ts">
 import WelcomeItem from './WelcomeItem.vue'
-import DocumentationIcon from './icons/IconDocumentation.vue'
-import ToolingIcon from './icons/IconTooling.vue'
-import EcosystemIcon from './icons/IconEcosystem.vue'
-import CommunityIcon from './icons/IconCommunity.vue'
-import SupportIcon from './icons/IconSupport.vue'
 </script>
 
 <template>
   <WelcomeItem>
     <template #icon>
-      <DocumentationIcon />
+      <a-icon name="svgs/docmentation" size="20" />
     </template>
     <template #heading>Documentation</template>
 
@@ -21,7 +16,7 @@ import SupportIcon from './icons/IconSupport.vue'
 
   <WelcomeItem>
     <template #icon>
-      <ToolingIcon />
+      <a-icon name="svgs/tooling" size="20" />
     </template>
     <template #heading>Tooling</template>
 
@@ -43,7 +38,7 @@ import SupportIcon from './icons/IconSupport.vue'
 
   <WelcomeItem>
     <template #icon>
-      <EcosystemIcon />
+      <a-icon name="svgs/ecosystem" size="20" />
     </template>
     <template #heading>Ecosystem</template>
 
@@ -59,7 +54,7 @@ import SupportIcon from './icons/IconSupport.vue'
 
   <WelcomeItem>
     <template #icon>
-      <CommunityIcon />
+      <a-icon name="svgs/community" size="20" />
     </template>
     <template #heading>Community</template>
 
@@ -77,7 +72,7 @@ import SupportIcon from './icons/IconSupport.vue'
 
   <WelcomeItem>
     <template #icon>
-      <SupportIcon />
+      <a-icon name="svgs/support" size="20" />
     </template>
     <template #heading>Support Vue</template>
 

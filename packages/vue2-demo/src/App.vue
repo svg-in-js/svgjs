@@ -7,7 +7,7 @@
     <!-- <svg style="width:77px;height:20px" data-id="s-1">
       <use xlink:href="#svg-workshop-tmap-logo"></use>
     </svg> -->
-    <svg-symbol-icon :tooltip="tooltip" :name="name" :size="[18, 20]" />
+    <symbol-icon :tooltip="tooltip" :name="name" :size="[18, 20]" />
     <svg>
       <rect x="25" y="25"  width="200" height="5" rx="3" fill="pink" class="load-bar"></rect>
     </svg>
@@ -30,10 +30,7 @@ import 'tippy.js/dist/tippy.css';
 // import 'tippy.js/themes/light.css';
 
 // console.log(SvgSymbolIcon)
-Vue.use(svgSymbolIcon, {
-  color: '#aaa',
-  hoverColor: '#f90',
-});
+Vue.use(svgSymbolIcon);
 export default {
   name: 'App',
   components: {
