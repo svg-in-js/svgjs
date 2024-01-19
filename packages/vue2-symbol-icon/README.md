@@ -33,7 +33,7 @@ Vue.use(symbolIconPlugin);
 
 | 名称 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| name | string | svg-symbol-icon | 组件名称 |
+| name | string | symbol-icon | 组件名称 |
 | color | string | -- | 图标的默认颜色 |
 | disabledColor | string | -- | 图标被禁用时的颜色 |
 | hoverColor | string | -- | 鼠标经过图标时的颜色 |
@@ -61,7 +61,7 @@ setGlobalOption({
 ### 基本用法
 
 ```html
-<svg-symbol-icon name="name" />
+<symbol-icon name="name" />
 ```
 
 * 支持下列 props
