@@ -301,6 +301,18 @@ function replaceSingleColor(svgData) {
     return svgData;
 }
 
+const fillOrStrokeReg = /(?:svg|path|rect|circle|polygon|line|polyline|ellipse)[^>]+?(?:fill|stroke)="[^"]+"/gi;
+/**
+ * 当路径中没有设置 fill 或者 stroke 时，在 svg 标签上设置默认的 fill='currentColor' 和 stroke='currentColor'
+ */
+function setDefaultFillStroke(svgData) {
+    const colorSets = svgData.data.match(fillOrStrokeReg);
+    if (colorSets)
+        return svgData;
+    svgData.data = svgData.data.replace(/^(<svg)/, '$1 fill="currentColor" stroke="currentColor"');
+    return svgData;
+}
+
 /**
  * Object.assign 做合并时，如果传入的值为 undefined 也会替换原有的值
  * 此处兼容不传值或者值为 undefined 时，不做 merge 操作，使用原值
@@ -451,6 +463,7 @@ class Svg2js {
             collectInfo,
             removeWidthHeight,
             replaceSingleColor,
+            setDefaultFillStroke,
             ...plugins,
         ])(data);
     }
