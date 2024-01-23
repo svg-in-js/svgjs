@@ -1,6 +1,6 @@
 {
   "name": "@svgjs/cli",
-  "version": "1.1.11",
+  "version": "1.1.12",
   "description": "",
   "main": "dist/index.es.js",
   "module": "dist/index.es.js",

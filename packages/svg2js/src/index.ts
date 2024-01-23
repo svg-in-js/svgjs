@@ -7,6 +7,7 @@ import { svgoPlugins } from './svgo-plugins';
 import { collectInfo } from './plugin/collect-info';
 import { removeWidthHeight } from './plugin/remove-width-height';
 import { replaceSingleColor } from './plugin/replace-single-color';
+import { setDefaultFillStroke } from './plugin/set-default-fill-stroke';
 import { compose, formatFilename, mergeOption, PluginFn } from './util';
 
 export interface ISvgData {
@@ -163,6 +164,7 @@ export default class Svg2js {
       collectInfo,
       removeWidthHeight,
       replaceSingleColor,
+      setDefaultFillStroke,
       ...plugins,
     ])(data);
   }
