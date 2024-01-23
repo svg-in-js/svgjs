@@ -100,7 +100,7 @@ export default class Svg2js {
     const { nameSep, setFileName } = this.option;
 
     svgFiles.forEach(svgFilePath => {
-      const svgStr = fse.readFileSync(
+      let svgStr = fse.readFileSync(
         resolveCWD(svgFilePath),
         {
           encoding: 'utf-8',
@@ -113,6 +113,9 @@ export default class Svg2js {
       } else if (typeof setFileName === 'function') {
         filename = setFileName(filename, nameSep);
       }
+
+      // svgo 的 convertColors 插件会移除 #000000，此处做个兼容
+      svgStr = svgStr.replace(/#000(000)?/g, '#000001');
       
       const buildOutput = optimize(svgStr, {
         path: compatiblePath,

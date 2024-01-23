@@ -1,6 +1,6 @@
 {
   "name": "@svgjs/vue2-symbol-icon",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "svg icon for vue2.x",
   "module": "./dist/svg-symbol-icon.es.js",
   "main": "./dist/svg-symbol-icon.cjs.js",
@@ -32,8 +32,7 @@
     "rollup-plugin-vue": "^5.1.9"
   },
   "dependencies": {
-    "tippy.js": "^6.3.7",
-    "@svgjs/cli": "^1.1.9"
+    "tippy.js": "^6.3.7"
   },
   "peerDependencies": {
     "tippy.js": "^6.3.7"
