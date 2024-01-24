@@ -222,4 +222,4 @@ setGlobalOption({
 
 通过 web 组件提供常规的交互功能，用统一的方式来使用 svg；
 
-最后，如果有同学也对 svg 比较感兴趣，欢迎加入一起开发，或者分享您宝贵的意见，我们的愿景就是：将网页上所有的图形元素用 svg 来实现，仓库地址：[svgjs](https://github.com/svg-in-js/svgjs)
+最后，如果有同学也对 svg 比较感兴趣，欢迎加入一起开发，或者分享您宝贵的意见，我们的愿景就是：将网页上所有的图形元素用 svg 来实现，仓库地址：[svgjs](https://github.com/svg-in-js/svgjs)，欢迎 star !
