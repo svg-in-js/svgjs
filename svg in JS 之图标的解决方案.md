@@ -85,6 +85,8 @@ npm i -D @svgjs/cli
 
 将 `src/assets` 目录下的 svg 图标进行优化处理后生成一个 `svg-sprite.js` 文件到 `src/js` 目录下，后续需求迭代如果对图标有进行增删改的操作，同样执行这个命令即可
 
+> 记得要单独 import 这个 svg-sprite.js 哦
+
 * svg2js preview
 
 在 `package.json` 的 `scripts` 里添加一个命令，如:
