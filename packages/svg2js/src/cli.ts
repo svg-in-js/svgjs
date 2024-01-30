@@ -109,10 +109,11 @@ function run() {
   } else {
     if ([undefined, 'b', 'build'].includes(command as string | undefined)) {
       build();
-      log.info(`Please import this svg-sprite file in your project, then you can use it by filename.`, CLI_NAME);
+      log.info(`Please import this ${c.cyan('svg-sprite.js')} file in your project, then you can use it by filename.`, CLI_NAME);
       log.info(`If you dont remembered the filename, you can run '${CLI_NAME} preview [option]', find a svg and copy it.`);
     } else if (command === 'preview') {
       build(true);
+      log.info('you can click the output file to preview and use your svg.', CLI_NAME);
     } else {
       console.log('the command only support build or preview.');
     }
