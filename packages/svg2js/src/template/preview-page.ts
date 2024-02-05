@@ -39,12 +39,45 @@ export function createPreviewPage(svgSpriteRuntime: string, svgsData: object, co
         background: #f1f2f2;
       }
       .svg {
-        display: inline-block;
         font-size: 12px;
         text-align: left;
         margin-right: 15px;
         margin-bottom: 15px;
         cursor: pointer;
+        min-width: 156px;
+        height: 50px;
+        background: #fff;
+        border-radius: 3px;
+        box-shadow: 3px 3px 6px -2px #cdcdcd;
+        vertical-align: top;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 10px;
+      }
+      .svg .svg-info {
+        flex: 1;
+        margin-left: 9px;
+        border-left: 2px solid #eee;
+        padding-left: 4px;
+      }
+      .svg svg {
+        margin: 10px auto 8px;
+        display: block;
+        width: 24px!important;
+        height: 24px!important;
+      }
+      .svg-name {
+        text-align: center;
+        padding: 0 5px;
+        word-break: break-all;
+        line-height: 15px;
+      }
+      .svg-info-item {
+        padding: 1px 5px;
+      }
+      .svg-info-item span {
+        font-size: 12px;
+        color: #a8a6a6;
       }
       .message {
         position: fixed;
@@ -76,7 +109,7 @@ export function createPreviewPage(svgSpriteRuntime: string, svgsData: object, co
           <span>共 <b class="total"></b> 个</span>
           <span style="margin-left: 35px">设置图标组件名</span>
           <input id="comp-name" />
-          <small style="color: #666;">* 点击图标即可复制代码</small>
+          <small style="color: #666;">* 点击下面的图标即可复制组件代码</small>
         </div>
     
         <div class="main-content">
@@ -123,8 +156,10 @@ export function createPreviewPage(svgSpriteRuntime: string, svgsData: object, co
         const svgItem = (filename, data, percent) => {
           return \`<div class="svg" onclick="copy('\${filename}')">
             <svg style="width: \${data.width}px; height: \${data.height}px"><use xlink:href="#\${filename}"></use></svg>
-            <p>文件名: \${filename}</p>
-            <p>压缩率: \${percent}%</p>
+            <div class="svg-info">
+              <p class="svg-info-item"><span>文件名</span> <b>\${filename}</b></p>
+              <p class="svg-info-item"><span>压缩率</span> \${percent}%</p>
+            </div>
           </div>\`;
         }
     
