@@ -17,7 +17,7 @@ some packages about svg in JS
 
 * **[svg-progress](https://github.com/svg-in-js/svgjs/tree/main/packages/svg-progress)** (nice to have) 基于 svg 的进度条组件
 
-* **[svg-skeleton](https://github.com/svg-in-js/svgjs/tree/main/packages/svg-skeleton)** (nice to have) 基于 svg 的骨架屏组件，期待更加美观和优雅的骨架屏效果
+* **[svg-skeleton](https://github.com/svg-in-js/svgjs/tree/main/packages/svg-skeleton)** (in progress) 基于 svg 的骨架屏组件，期待更加美观和优雅的骨架屏效果
 
 * **[svg-sparkline](https://github.com/svg-in-js/svgjs/tree/main/packages/svg-progress)** (nice to have) 基于 svg 的 mini 图表，在 web worker 的加持下，支持对大批量的 mini 图表进行渲染
 

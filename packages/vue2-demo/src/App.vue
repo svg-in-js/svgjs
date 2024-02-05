@@ -57,6 +57,9 @@ export default {
 </script>
 
 <style>
+body{
+  content-visibility: auto;
+}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
