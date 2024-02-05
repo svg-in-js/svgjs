@@ -89,6 +89,8 @@ npm i -D @svgjs/cli
 
 * svg2js preview
 
+<img src="./svgjs-svg2js-preview.png" width="750px" />
+
 在 `package.json` 的 `scripts` 里添加一个命令，如:
 
 ```js
@@ -212,9 +214,6 @@ setGlobalOption({
 
 识别到单色图标后，将其颜色值重置为 `currentColor`，那么就可以通过简单的 `css color` 设置来控制图标的颜色了，接下来处理 `hover color`，`disabled color` 就只需要切换 `class` 即可，至此，svg 的颜色控制就跟普通的元素颜色控制没差别了；
 
-### 更新
-
-* 已将 `@svgjs/cli` 包内置于 `@svgjs/vue2-symbol-icon` 和 `@svgjs/vue-symbol-icon`，无需安装两个包，只需要安装组件包即可使用到 `svg2js` 命令
 
 ### 总结
 
