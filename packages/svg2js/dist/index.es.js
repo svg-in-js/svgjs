@@ -1,6 +1,7 @@
 import { resolveCWD, fse } from '@all-in-js/utils';
 import { globSync } from 'glob';
 import { optimize } from 'svgo';
+import { uid } from 'uid';
 
 function createSvgSpriteRuntimeJs(spriteId, svgSymbols, svgXMLNs) {
     const runtimeJs = `document.addEventListener('DOMContentLoaded', function() {
@@ -250,7 +251,17 @@ const svgoPlugins = [
     'sortDefsChildren',
     'removeTitle',
     'removeDesc',
-    'prefixIds', // 配合 cleanupIds，在 minify ID 后再加上文件名作为前缀，防止不同文件 ID 重复
+    {
+        name: 'prefixIds',
+        params: {
+            delim: '',
+            prefixClassNames: false,
+            prefix() {
+                return uid(4);
+            },
+        },
+    }
+    //'prefixIds', // 配合 cleanupIds，在 minify ID 后再加上文件名作为前缀，防止不同文件 ID 重复
 ];
 
 const matchSvgTag$1 = /<svg[^>]+>/;
@@ -458,7 +469,7 @@ class Svg2js {
             // svgo 的 convertColors 插件会移除 #000000，此处做个兼容
             svgStr = svgStr.replace(/#000(000)?/g, '#000001');
             const buildOutput = optimize(svgStr, {
-                path: compatiblePath,
+                path: `${filename}.svg`,
                 multipass: true,
                 plugins: svgoPlugins,
             });

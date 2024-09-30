@@ -2,6 +2,7 @@
   <div class="hello">
     <h1>{{ msg }}</h1>
     <h2>Essential Links</h2>
+    <p>{{ receivedMsg }}</p>
     <ul>
       <li>
         <a
@@ -88,9 +89,15 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'Welcome to Your Vue.js App',
+      receivedMsg: '--',
     }
-  }
+  },
+  mounted() {
+    this.$bc.addEventListener('message', e => {
+      this.receivedMsg = e.data;
+    });
+  },
 }
 </script>
 

@@ -31,11 +31,11 @@ export function setGlobalOption(option = {}) {
   }
 
   if (option.color) {
-    setRootCssProp(hoverColorKey, option.hoverColor);
+    // setRootCssProp(hoverColorKey, option.hoverColor);
   }
 
   if (option.color) {
-    setRootCssProp(activedColorKey, option.activedColor);
+    // setRootCssProp(activedColorKey, option.activedColor);
   }
 
   if (option.color) {
@@ -177,12 +177,12 @@ export default {
 
       // 设置鼠标 hover 时的颜色
       if (hoverColor) {
-        style[hoverColorKey] = hoverColor;
+        // style[hoverColorKey] = hoverColor;
       }
 
       // 设置鼠标按下时的颜色
       if (activedColor) {
-        style[activedColorKey] = activedColor;
+        // style[activedColorKey] = activedColor;
       }
 
       // 设置禁用时的颜色
@@ -259,11 +259,11 @@ export default {
 }
 
 .svg-symbol-icon:hover {
-  color: var(--svg-symbol-icon-hover-color);
+  /* scolor: var(--svg-symbol-icon-hover-color); */
 }
 
 .svg-symbol-icon:active {
-  color: var(--svg-symbol-icon-actived-color);
+  /* color: var(--svg-symbol-icon-actived-color); */
 }
 
 .svg-symbol-spin {

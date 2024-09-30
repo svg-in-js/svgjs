@@ -1,4 +1,5 @@
 import { PluginConfig } from 'svgo';
+import { uid } from 'uid';
 
 export const svgoPlugins: PluginConfig[] = [
   'removeDoctype',
@@ -36,5 +37,15 @@ export const svgoPlugins: PluginConfig[] = [
   'sortDefsChildren',
   'removeTitle',
   'removeDesc',
-  'prefixIds', // 配合 cleanupIds，在 minify ID 后再加上文件名作为前缀，防止不同文件 ID 重复
+  {
+    name: 'prefixIds',
+    params: {
+      delim: '',
+      prefixClassNames: false,
+      prefix() {
+        return uid(4);
+      },
+    },
+  }
+  //'prefixIds', // 配合 cleanupIds，在 minify ID 后再加上文件名作为前缀，防止不同文件 ID 重复
 ];
