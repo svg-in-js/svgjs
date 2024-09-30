@@ -119,7 +119,7 @@ export default class Svg2js {
       svgStr = svgStr.replace(/#000(000)?/g, '#000001');
       
       const buildOutput = optimize(svgStr, {
-        path: compatiblePath,
+        path: `${filename}.svg`,
         multipass: true,
         plugins: svgoPlugins,
       });

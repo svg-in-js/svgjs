@@ -4,9 +4,13 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 
-import '../config/svg-sprite.js'
+import '../static/svg-sprite.js'
 
 Vue.config.productionTip = false
+
+const bc = new BroadcastChannel('app');
+
+Vue.prototype.$bc = bc;
 
 /* eslint-disable no-new */
 new Vue({

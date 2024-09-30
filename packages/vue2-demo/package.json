@@ -9,7 +9,7 @@
     "start": "npm run dev",
     "lint": "eslint --ext .js,.vue src",
     "build": "node build/build.js",
-    "preview:svg": "node ../svg2js/dist/cli.cjs.js preview -e 'src/assets/svg' -o static -sep /",
+    "preview:svg": "npx @svgjs/cli preview -e 'src/assets' -o static",
     "build:svg": "node ../svg2js/dist/cli.cjs.js build -e 'src/assets' -o static -sep /"
   },
   "dependencies": {

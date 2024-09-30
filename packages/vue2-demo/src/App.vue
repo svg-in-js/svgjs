@@ -19,6 +19,7 @@
     stroke-width="4"
     ></polyline>
 </svg>
+<symbol-icon name="svg/logo" />
   </div>
 </template>
 
@@ -28,7 +29,6 @@ import svgSymbolIcon from '@svgjs/vue2-symbol-icon';
 import 'tippy.js/dist/tippy.css';
 // import logo from './assets/logo.png';
 // import 'tippy.js/themes/light.css';
-
 // console.log(SvgSymbolIcon)
 Vue.use(svgSymbolIcon);
 export default {
